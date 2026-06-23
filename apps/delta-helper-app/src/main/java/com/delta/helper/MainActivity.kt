@@ -8,9 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
-import com.delta.features.activation.ui.ActivationGate
-import com.delta.features.activation.ui.ActivationPurchaseUrlEffect
-import com.delta.helper.screen.HelperHomeScreen
+import com.delta.helper.screen.HelperRootScreen
 import com.delta.helper.ui.theme.DeltaHelperTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -21,11 +19,15 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             DeltaHelperTheme {
-                ActivationPurchaseUrlEffect()
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    ActivationGate(modifier = Modifier.padding(innerPadding)) {
-                        HelperHomeScreen(modifier = Modifier.fillMaxSize())
-                    }
+                Scaffold(
+                    modifier = Modifier.fillMaxSize(),
+                    containerColor = com.delta.helper.ui.theme.HzColors.BgPrimary,
+                ) { innerPadding ->
+                    HelperRootScreen(
+                        modifier = Modifier
+                            .padding(innerPadding)
+                            .fillMaxSize(),
+                    )
                 }
             }
         }
