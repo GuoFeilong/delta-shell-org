@@ -65,3 +65,6 @@ val helperHomeGames: List<GameProfileItem> = listOf(
         accentGlow = Color(0x664DA6FF),
     ),
 )
+
+fun gameProfileFor(id: GameId): GameProfileItem =
+    helperHomeGames.first { it.id == id }

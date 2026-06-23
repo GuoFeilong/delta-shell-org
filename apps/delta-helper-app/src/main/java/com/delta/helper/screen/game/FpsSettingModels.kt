@@ -1,0 +1,30 @@
+package com.delta.helper.screen.game
+
+import com.delta.helper.screen.home.GameId
+
+data class FpsOption(
+    val id: String,
+    val label: String,
+    val isHighFps: Boolean = false,
+)
+
+object FpsSettingCopy {
+    const val SECTION_TITLE = "画质设置"
+    const val FPS_TITLE = "帧数设置"
+    const val FPS_HINT = "提高可增加画面流畅度；若运行卡顿、发热或耗电量过大，可适当降低"
+    const val PREVIEW_NOTE = "以下为参考方案预览，需在对应游戏内手动调整设置"
+}
+
+val fpsSettingOptions: List<FpsOption> = listOf(
+    FpsOption(id = "fps90", label = "90帧"),
+    FpsOption(id = "fps120", label = "120帧"),
+    FpsOption(id = "fps144", label = "144帧", isHighFps = true),
+    FpsOption(id = "fps165", label = "165帧", isHighFps = true),
+)
+
+fun defaultFpsForGame(gameId: GameId): String = when (gameId) {
+    GameId.Delta -> "fps120"
+    GameId.ArenaBreakout -> "fps90"
+    GameId.PeaceElite -> "fps90"
+    GameId.CallOfDuty -> "fps120"
+}

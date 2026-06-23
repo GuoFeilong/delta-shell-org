@@ -2,7 +2,6 @@ package com.delta.helper.screen.home
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -14,8 +13,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -28,8 +25,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.delta.helper.ui.theme.HzColors
@@ -114,42 +109,6 @@ fun GameProfileCard(
                 color = item.accent.copy(alpha = 0.7f),
             )
         }
-    }
-}
-
-@Composable
-private fun GameIconBadge(
-    iconRes: Int,
-    contentDescription: String,
-    accent: Color,
-    modifier: Modifier = Modifier,
-) {
-    Box(
-        modifier = modifier.size(52.dp),
-        contentAlignment = Alignment.Center,
-    ) {
-        Box(
-            modifier = Modifier
-                .matchParentSize()
-                .clip(CircleShape)
-                .background(
-                    brush = Brush.radialGradient(
-                        colors = listOf(
-                            accent.copy(alpha = 0.35f),
-                            accent.copy(alpha = 0.05f),
-                        ),
-                    ),
-                )
-                .border(1.dp, accent.copy(alpha = 0.45f), CircleShape),
-        )
-        Image(
-            painter = painterResource(iconRes),
-            contentDescription = contentDescription,
-            modifier = Modifier
-                .size(46.dp)
-                .clip(CircleShape),
-            contentScale = ContentScale.Crop,
-        )
     }
 }
 
