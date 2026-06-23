@@ -20,5 +20,13 @@ gradlePlugin {
             id = "delta.android.application"
             implementationClass = "AndroidApplicationConventionPlugin"
         }
+        register("hiltAndroidLibrary") {
+            id = "delta.android.hilt.library"
+            implementationClass = "HiltAndroidLibraryConventionPlugin"
+        }
+        register("hiltAndroidApplication") {
+            id = "delta.android.hilt.application"
+            implementationClass = "HiltAndroidApplicationConventionPlugin"
+        }
     }
 }

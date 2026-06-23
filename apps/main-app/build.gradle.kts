@@ -1,6 +1,7 @@
 
 plugins {
     id("delta.android.application")
+    id("delta.android.hilt.application")
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.detekt)
     alias(libs.plugins.ktlint)
