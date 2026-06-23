@@ -1,5 +1,7 @@
 package com.delta.core.network.config
 
+import com.delta.core.network.logging.HttpLoggingConfig
+
 /**
  * Fluent builder for [NetworkConfig]. Business modules use this to declare host,
  * headers, and other HTTP parameters without touching OkHttp/Retrofit directly.
@@ -12,6 +14,8 @@ package com.delta.core.network.config
  *     header("X-Client-Version", BuildConfig.VERSION_NAME)
  *     hostHeader("api.example.com") // optional reverse-proxy override
  *     loggingEnabled(BuildConfig.DEBUG)
+ *     httpLoggingTag("DeltaHttp") // Logcat filter: tag:DeltaHttp
+ *     includeHttpPaths("/activation") // optional path filter
  * }
  * ```
  */
@@ -23,6 +27,7 @@ class NetworkConfigBuilder {
     private var readTimeoutSeconds: Long = NetworkConfig.DEFAULT_READ_TIMEOUT_SECONDS
     private var writeTimeoutSeconds: Long = NetworkConfig.DEFAULT_WRITE_TIMEOUT_SECONDS
     private var loggingEnabled: Boolean = false
+    private var httpLoggingConfig: HttpLoggingConfig = HttpLoggingConfig.DEFAULT
 
     fun baseUrl(url: String) = apply {
         baseUrl = url
@@ -60,6 +65,22 @@ class NetworkConfigBuilder {
         loggingEnabled = enabled
     }
 
+    fun httpLoggingConfig(config: HttpLoggingConfig) = apply {
+        httpLoggingConfig = config
+    }
+
+    fun httpLoggingTag(tag: String) = apply {
+        httpLoggingConfig = httpLoggingConfig.copy(tag = tag)
+    }
+
+    fun includeHttpPaths(vararg paths: String) = apply {
+        httpLoggingConfig = httpLoggingConfig.copy(includePathPatterns = paths.toList())
+    }
+
+    fun excludeHttpPaths(vararg paths: String) = apply {
+        httpLoggingConfig = httpLoggingConfig.copy(excludePathPatterns = paths.toList())
+    }
+
     fun build(): NetworkConfig = DefaultNetworkConfig(
         baseUrl = baseUrl,
         headers = headers.toMap(),
@@ -68,6 +89,7 @@ class NetworkConfigBuilder {
         readTimeoutSeconds = readTimeoutSeconds,
         writeTimeoutSeconds = writeTimeoutSeconds,
         loggingEnabled = loggingEnabled,
+        httpLoggingConfig = httpLoggingConfig,
     )
 }
 

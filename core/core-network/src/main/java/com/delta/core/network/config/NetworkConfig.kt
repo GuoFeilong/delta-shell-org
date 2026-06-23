@@ -1,5 +1,6 @@
 package com.delta.core.network.config
 
+import com.delta.core.network.logging.HttpLoggingConfig
 import java.util.concurrent.TimeUnit
 
 /**
@@ -14,6 +15,8 @@ interface NetworkConfig {
     val readTimeoutSeconds: Long
     val writeTimeoutSeconds: Long
     val loggingEnabled: Boolean
+    val httpLoggingConfig: HttpLoggingConfig
+        get() = HttpLoggingConfig.DEFAULT
 
     val normalizedBaseUrl: String
         get() = if (baseUrl.endsWith("/")) baseUrl else "$baseUrl/"

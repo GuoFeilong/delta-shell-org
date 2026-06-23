@@ -1,7 +1,9 @@
 package com.delta.helper.di
 
+import com.delta.helper.screen.card.ActivationCheckPort
 import com.delta.helper.screen.card.CardActivationPort
-import com.delta.helper.screen.card.PlaceholderCardActivationPort
+import com.delta.helper.screen.card.DevActivationCheckPort
+import com.delta.helper.screen.card.RemoteCardActivationPort
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -15,6 +17,12 @@ abstract class CardActivateModule {
     @Binds
     @Singleton
     abstract fun bindCardActivationPort(
-        impl: PlaceholderCardActivationPort,
+        impl: RemoteCardActivationPort,
     ): CardActivationPort
+
+    @Binds
+    @Singleton
+    abstract fun bindActivationCheckPort(
+        impl: DevActivationCheckPort,
+    ): ActivationCheckPort
 }

@@ -3,3 +3,8 @@
 #
 # macOS + Android Studio:
 # org.gradle.java.home=/Applications/Android Studio.app/Contents/jbr/Contents/Home
+#
+# delta-helper-app daily 构建对接本机 delta-api（模拟器访问宿主机）：
+# dailyApiBaseUrl=http://10.0.2.2:8080/
+# dailyApiHostHeader=
+# 真机调试时把 10.0.2.2 换成电脑局域网 IP。

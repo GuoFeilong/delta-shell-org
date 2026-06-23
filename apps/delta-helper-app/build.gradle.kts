@@ -59,15 +59,25 @@ android {
             dimension = "environment"
             applicationIdSuffix = ".daily"
             versionNameSuffix = "-daily"
-            buildConfigField("String", "API_BASE_URL", "\"https://daily-api.example.com/\"")
-            buildConfigField("String", "API_HOST_HEADER", "\"daily-api.example.com\"")
+            buildConfigField(
+                "String",
+                "API_BASE_URL",
+                "\"${project.findProperty("dailyApiBaseUrl") ?: "http://10.0.2.2:8080/"}\"",
+            )
+            buildConfigField(
+                "String",
+                "API_HOST_HEADER",
+                "\"${project.findProperty("dailyApiHostHeader") ?: ""}\"",
+            )
             buildConfigField("String", "CLIENT_CHANNEL", "\"daily\"")
+            buildConfigField("boolean", "SIMULATE_NOT_ACTIVATED", "true")
         }
         create("online") {
             dimension = "environment"
             buildConfigField("String", "API_BASE_URL", "\"https://api.example.com/\"")
             buildConfigField("String", "API_HOST_HEADER", "\"\"")
             buildConfigField("String", "CLIENT_CHANNEL", "\"official\"")
+            buildConfigField("boolean", "SIMULATE_NOT_ACTIVATED", "false")
         }
     }
 
@@ -89,12 +99,13 @@ dependencies {
     implementation(project(":core:core-network"))
     implementation(project(":core:core-activation"))
 
+    implementation(libs.androidx.datastore.preferences)
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
 
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.bundles.compose)
-    implementation("androidx.compose.material:material-icons-extended")
+    implementation(libs.androidx.compose.material.icons.extended)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.hilt.navigation.compose)

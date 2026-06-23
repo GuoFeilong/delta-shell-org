@@ -49,6 +49,7 @@ fun GameLaunchDock(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
+    loading: Boolean = false,
 ) {
     Box(
         modifier = modifier
@@ -68,6 +69,7 @@ fun GameLaunchDock(
             accent = accent,
             onClick = onClick,
             enabled = enabled,
+            loading = loading,
         )
     }
 }
@@ -78,6 +80,7 @@ fun GameLaunchButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
+    loading: Boolean = false,
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val pressed by interactionSource.collectIsPressedAsState()
@@ -87,6 +90,7 @@ fun GameLaunchButton(
         label = "launch-scale",
     )
     val alpha = if (enabled) 1f else 0.4f
+    val label = if (loading) "..." else GameLaunchCopy.BUTTON_LABEL
     val outerShape = remember { tacticalButtonShape(chamferRatio = 0.22f) }
     val innerShape = remember { tacticalButtonShape(chamferRatio = 0.22f) }
 
@@ -128,7 +132,7 @@ fun GameLaunchButton(
             contentAlignment = Alignment.Center,
         ) {
             Text(
-                text = GameLaunchCopy.BUTTON_LABEL,
+                text = label,
                 style = MaterialTheme.typography.titleLarge.copy(
                     fontWeight = FontWeight.Black,
                     letterSpacing = 10.sp,

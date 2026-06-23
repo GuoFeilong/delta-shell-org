@@ -3,10 +3,10 @@ package com.delta.core.network.factory
 import com.delta.core.network.config.NetworkConfig
 import com.delta.core.network.interceptor.DynamicHeadersInterceptor
 import com.delta.core.network.interceptor.HostHeaderInterceptor
+import com.delta.core.network.logging.FormattedHttpLoggingInterceptor
 import kotlinx.serialization.json.Json
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
-import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.create
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
@@ -57,9 +57,7 @@ object NetworkClientFactory {
 
         if (config.loggingEnabled) {
             builder.addInterceptor(
-                HttpLoggingInterceptor().apply {
-                    level = HttpLoggingInterceptor.Level.BODY
-                },
+                FormattedHttpLoggingInterceptor(config.httpLoggingConfig),
             )
         }
 

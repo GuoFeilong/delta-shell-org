@@ -6,7 +6,12 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.widget.Toast
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -19,6 +24,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -29,19 +35,19 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.delta.helper.screen.component.HzCardInputField
 import com.delta.helper.screen.component.HzConfirmDialog
-import com.delta.helper.screen.component.HzHeroSection
 import com.delta.helper.screen.component.HzInlineMessage
 import com.delta.helper.screen.component.HzLegalAgreementRow
-import com.delta.helper.screen.component.HzNoticeBanner
 import com.delta.helper.screen.component.HzPrimaryButton
 import com.delta.helper.screen.component.HzSecondaryButton
-import com.delta.helper.screen.component.HzTipsCard
 import com.delta.helper.screen.component.HzTopBar
+import com.delta.helper.screen.home.HelperHomeBackground
 import com.delta.helper.screen.layout.HelperAdaptiveContainer
 import com.delta.helper.screen.layout.rememberHelperAdaptiveSpec
 import com.delta.helper.screen.legal.LegalCopy
 import com.delta.helper.screen.legal.LegalDocType
 import com.delta.helper.screen.legal.LegalDocumentScreen
+import kotlinx.coroutines.delay
+import kotlin.time.Duration.Companion.milliseconds
 
 @Composable
 fun CardActivateRoute(
@@ -145,79 +151,108 @@ fun CardActivateScreen(
     modifier: Modifier = Modifier,
     spec: com.delta.helper.screen.layout.HelperAdaptiveSpec = rememberHelperAdaptiveSpec(),
 ) {
-    HelperAdaptiveContainer(
+    var visible by remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        delay(60.milliseconds)
+        visible = true
+    }
+
+    Box(
         modifier = modifier
             .fillMaxSize()
             .imePadding(),
-        spec = spec,
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-                .padding(
-                    top = if (spec.isTabletOrFoldExpanded) 24.dp else 8.dp,
-                    bottom = 24.dp,
-                ),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
+        HelperHomeBackground()
+
+        HelperAdaptiveContainer(
+            modifier = Modifier.fillMaxSize(),
+            spec = spec,
         ) {
-            HzTopBar(
-                title = CardActivateCopy.PAGE_TITLE,
-                subtitle = CardActivateCopy.PAGE_SUBTITLE,
-                showBack = true,
-                onBack = onBack,
-            )
-
-            HzNoticeBanner(text = CardActivateCopy.PRODUCT_NATURE_SHORT)
-
-            HzHeroSection(
-                title = CardActivateCopy.PAGE_TITLE,
-                description = CardActivateCopy.PAGE_DESC,
-                modifier = Modifier.padding(vertical = if (spec.isTabletOrFoldExpanded) 8.dp else 0.dp),
-            )
-
-            HzCardInputField(
-                value = uiState.cardCode,
-                onValueChange = onCardCodeChange,
-                placeholder = CardActivateCopy.INPUT_PLACEHOLDER,
-                enabled = !uiState.isActivating,
-            )
-
-            HzLegalAgreementRow(
-                checked = uiState.legalAccepted,
-                onCheckedChange = onLegalCheckedChange,
-                onOpenLegal = onOpenLegal,
-            )
-
-            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                HzPrimaryButton(
-                    text = if (uiState.isActivating) {
-                        CardActivateCopy.ACTIVATING_BUTTON
-                    } else {
-                        CardActivateCopy.ACTIVATE_BUTTON
-                    },
-                    onClick = onActivateClick,
-                    enabled = uiState.canActivate,
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+                    .padding(
+                        top = if (spec.isTabletOrFoldExpanded) 24.dp else 8.dp,
+                        bottom = 28.dp,
+                    ),
+                verticalArrangement = Arrangement.spacedBy(20.dp),
+            ) {
+                HzTopBar(
+                    title = CardActivateCopy.PAGE_TITLE,
+                    subtitle = CardActivateCopy.PAGE_SUBTITLE,
+                    showBack = true,
+                    onBack = onBack,
                 )
 
-                HzSecondaryButton(
-                    text = CardActivateCopy.PURCHASE_BUTTON,
-                    onClick = onPurchaseClick,
-                    enabled = !uiState.isActivating,
-                )
+                AnimatedVisibility(
+                    visible = visible,
+                    enter = fadeIn(tween(450)) + slideInVertically(tween(450)) { it / 5 },
+                ) {
+                    CardActivateHero()
+                }
+
+                AnimatedVisibility(
+                    visible = visible,
+                    enter = fadeIn(tween(500, delayMillis = 80)) +
+                        slideInVertically(tween(500, delayMillis = 80)) { it / 4 },
+                ) {
+                    CardActivateGlassPanel {
+                        Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                            CardActivateNoticeStrip(text = CardActivateCopy.PRODUCT_NATURE_SHORT)
+
+                            HzCardInputField(
+                                value = uiState.cardCode,
+                                onValueChange = onCardCodeChange,
+                                placeholder = CardActivateCopy.INPUT_PLACEHOLDER,
+                                enabled = !uiState.isActivating,
+                            )
+
+                            HzLegalAgreementRow(
+                                checked = uiState.legalAccepted,
+                                onCheckedChange = onLegalCheckedChange,
+                                onOpenLegal = onOpenLegal,
+                            )
+
+                            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                                HzPrimaryButton(
+                                    text = if (uiState.isActivating) {
+                                        CardActivateCopy.ACTIVATING_BUTTON
+                                    } else {
+                                        CardActivateCopy.ACTIVATE_BUTTON
+                                    },
+                                    onClick = onActivateClick,
+                                    enabled = uiState.canActivate,
+                                )
+
+                                HzSecondaryButton(
+                                    text = CardActivateCopy.PURCHASE_BUTTON,
+                                    onClick = onPurchaseClick,
+                                    enabled = !uiState.isActivating,
+                                )
+                            }
+
+                            uiState.errorMessage?.let { message ->
+                                HzInlineMessage(message = message, isError = true)
+                            }
+
+                            uiState.successMessage?.let { message ->
+                                HzInlineMessage(message = message, isError = false)
+                            }
+                        }
+                    }
+                }
+
+                AnimatedVisibility(
+                    visible = visible,
+                    enter = fadeIn(tween(550, delayMillis = 160)),
+                ) {
+                    CardActivateTipsCard(text = CardActivateCopy.TIPS_TEXT)
+                }
+
+                Spacer(modifier = Modifier.height(4.dp))
             }
-
-            uiState.errorMessage?.let { message ->
-                HzInlineMessage(message = message, isError = true)
-            }
-
-            uiState.successMessage?.let { message ->
-                HzInlineMessage(message = message, isError = false)
-            }
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            HzTipsCard(text = CardActivateCopy.TIPS_TEXT)
         }
     }
 }

@@ -34,17 +34,31 @@ import com.delta.helper.screen.layout.rememberHelperAdaptiveSpec
 fun GameDetailRoute(
     game: GameProfileItem,
     onBack: () -> Unit,
+    onRequireActivation: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: GameDetailViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val spec = rememberHelperAdaptiveSpec()
     val context = LocalContext.current
-    val canLaunch = !uiState.deviceLoading && uiState.deviceInfo != null
+    val canLaunch = !uiState.deviceLoading &&
+        uiState.deviceInfo != null &&
+        !uiState.isCheckingActivation
 
     LaunchedEffect(game.id) {
         viewModel.initializeForGame(game.id)
         viewModel.loadDeviceInfo()
+    }
+
+    LaunchedEffect(viewModel) {
+        viewModel.events.collect { event ->
+            when (event) {
+                is GameDetailEvent.ShowToast -> {
+                    Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
+                }
+                GameDetailEvent.NavigateToActivation -> onRequireActivation()
+            }
+        }
     }
 
     Box(modifier = modifier.fillMaxSize()) {
@@ -95,9 +109,8 @@ fun GameDetailRoute(
                     modifier = Modifier.align(Alignment.BottomCenter),
                     accent = game.accent,
                     enabled = canLaunch,
-                    onClick = {
-                        Toast.makeText(context, "START", Toast.LENGTH_SHORT).show()
-                    },
+                    loading = uiState.isCheckingActivation,
+                    onClick = viewModel::onLaunchClick,
                 )
             }
         }
