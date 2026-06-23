@@ -1,16 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Theme.DeltaHelper" parent="android:Theme.Material.NoActionBar">
-        <item name="android:windowBackground">@color/hz_bg_primary</item>
-        <item name="android:windowNoTitle">true</item>
-        <item name="android:windowActionBar">false</item>
-        <item name="android:statusBarColor">@color/hz_bg_primary</item>
-        <item name="android:navigationBarColor">@color/hz_bg_primary</item>
-        <item name="android:windowLightStatusBar">false</item>
-        <item name="android:windowLightNavigationBar">false</item>
-    </style>
-
     <style name="Theme.DeltaHelper.Launch" parent="Theme.SplashScreen">
         <item name="android:windowBackground">@color/hz_bg_primary</item>
         <item name="android:windowNoTitle">true</item>
@@ -22,6 +12,10 @@
         <item name="windowSplashScreenBackground">@color/hz_bg_primary</item>
         <item name="windowSplashScreenAnimatedIcon">@drawable/ic_splash_transparent</item>
         <item name="windowSplashScreenIconBackgroundColor">@android:color/transparent</item>
+        <item name="android:windowSplashScreenBackground">@color/hz_bg_primary</item>
+        <item name="android:windowSplashScreenAnimatedIcon">@drawable/ic_splash_transparent</item>
+        <item name="android:windowSplashScreenIconBackgroundColor">@android:color/transparent</item>
+        <item name="android:windowSplashScreenAnimationDuration">0</item>
         <item name="postSplashScreenTheme">@style/Theme.DeltaHelper</item>
     </style>
 </resources>

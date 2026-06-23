@@ -9,11 +9,10 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
@@ -51,10 +50,9 @@ fun CustomSplashScreen(
     onFinished: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val iconScale = remember { Animatable(0.55f) }
+    val iconScale = remember { Animatable(0.6f) }
     val iconAlpha = remember { Animatable(0f) }
-    val textAlpha = remember { Animatable(0f) }
-    val textOffset = remember { Animatable(28f) }
+    val titleAlpha = remember { Animatable(0f) }
 
     val ringTransition = rememberInfiniteTransition(label = "splash-ring")
     val ringRotation by ringTransition.animateFloat(
@@ -77,28 +75,23 @@ fun CustomSplashScreen(
     )
 
     LaunchedEffect(onFinished) {
-        launch {
-            iconAlpha.animateTo(1f, tween(420))
-        }
+        launch { iconAlpha.animateTo(1f, tween(400)) }
         launch {
             iconScale.animateTo(
                 targetValue = 1f,
-                animationSpec = spring(dampingRatio = 0.62f, stiffness = 380f),
+                animationSpec = spring(dampingRatio = 0.65f, stiffness = 360f),
             )
         }
-        delay(380.milliseconds)
-        launch {
-            textAlpha.animateTo(1f, tween(520))
-        }
-        launch {
-            textOffset.animateTo(0f, tween(520, easing = LinearEasing))
-        }
-        delay(1_650.milliseconds)
+        delay(350.milliseconds)
+        launch { titleAlpha.animateTo(1f, tween(450)) }
+        delay(1_500.milliseconds)
         onFinished()
     }
 
     Box(
-        modifier = modifier.fillMaxSize(),
+        modifier = modifier
+            .fillMaxSize()
+            .background(HzColors.BgPrimary),
         contentAlignment = Alignment.Center,
     ) {
         SplashAnimatedBackground()
@@ -162,49 +155,23 @@ fun CustomSplashScreen(
                 )
             }
 
-            Spacer(modifier = Modifier.height(28.dp))
-
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
+            Text(
+                text = HelperHomeCopy.PAGE_TITLE,
                 modifier = Modifier
-                    .alpha(textAlpha.value)
-                    .padding(top = textOffset.value.dp),
-            ) {
-                Text(
-                    text = HelperHomeCopy.BRAND_LABEL,
-                    style = MaterialTheme.typography.labelSmall.copy(
-                        letterSpacing = MaterialTheme.typography.labelSmall.letterSpacing * 2.5f,
-                        fontWeight = FontWeight.SemiBold,
-                        brush = Brush.linearGradient(
-                            colors = listOf(HzColors.Primary, HzColors.PrimaryLight),
+                    .padding(top = 28.dp)
+                    .alpha(titleAlpha.value),
+                style = MaterialTheme.typography.headlineMedium.copy(
+                    fontWeight = FontWeight.Bold,
+                    brush = Brush.linearGradient(
+                        colors = listOf(
+                            HzColors.TextPrimary,
+                            HzColors.PrimaryLight,
+                            HzColors.Primary,
                         ),
                     ),
-                )
-
-                Text(
-                    text = HelperHomeCopy.PAGE_TITLE,
-                    modifier = Modifier.padding(top = 10.dp),
-                    style = MaterialTheme.typography.displaySmall.copy(
-                        fontWeight = FontWeight.Bold,
-                        brush = Brush.linearGradient(
-                            colors = listOf(
-                                HzColors.TextPrimary,
-                                HzColors.PrimaryLight,
-                                HzColors.Primary,
-                            ),
-                        ),
-                    ),
-                    textAlign = TextAlign.Center,
-                )
-
-                Text(
-                    text = HelperHomeCopy.PAGE_SUBTITLE,
-                    modifier = Modifier.padding(top = 8.dp),
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = HzColors.TextSecondary,
-                    textAlign = TextAlign.Center,
-                )
-            }
+                ),
+                textAlign = TextAlign.Center,
+            )
         }
     }
 }

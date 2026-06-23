@@ -22,7 +22,7 @@ data class GameProfileItem(
 
 object HelperHomeCopy {
     const val BRAND_LABEL = "GRAPHICS MONSTER"
-    const val PAGE_TITLE = "画质怪兽"
+    const val PAGE_TITLE = "画质怪兽2026"
     const val PAGE_SUBTITLE = "游戏画质与帧率参考工具"
     const val HERO_BADGE = "144 / 165 帧参考方案库（非效果承诺）"
     const val FOOTNOTE = "请选择要查看参考方案的游戏（144 / 165 帧档位仅供参考）"
