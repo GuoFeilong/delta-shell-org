@@ -101,7 +101,11 @@ class CardActivateViewModel @Inject constructor(
     private fun loadPurchaseUrl() {
         viewModelScope.launch {
             val url = cardActivationPort.fetchPurchaseUrl()
-            _uiState.update { it.copy(purchaseUrl = url) }
+            if (url == null) {
+                _uiState.update { it.copy(purchaseUrl = null, isActivated = true) }
+            } else {
+                _uiState.update { it.copy(purchaseUrl = url) }
+            }
         }
     }
 }

@@ -9,6 +9,9 @@ package com.delta.helper.screen.card
 interface CardActivationPort {
     suspend fun fetchPurchaseUrl(): String?
 
+    /** 后端未下发购卡链接时视为关闭激活门禁，App 可直接使用。 */
+    suspend fun isActivationGateEnabled(): Boolean
+
     suspend fun redeemCard(cardCode: String): CardActivationOutcome
 }
 

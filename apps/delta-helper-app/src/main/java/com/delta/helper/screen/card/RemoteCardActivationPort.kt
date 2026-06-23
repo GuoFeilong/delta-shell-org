@@ -20,6 +20,8 @@ class RemoteCardActivationPort @Inject constructor(
             else -> null
         }
 
+    override suspend fun isActivationGateEnabled(): Boolean = fetchPurchaseUrl() != null
+
     override suspend fun redeemCard(cardCode: String): CardActivationOutcome =
         when (val result = activationRepository.redeemCard(cardCode).first { it !is ApiResult.Loading }) {
             is ApiResult.Success -> {
