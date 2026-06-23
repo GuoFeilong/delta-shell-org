@@ -1,4 +1,5 @@
 import com.android.build.api.variant.BuildConfigField
+import java.util.Properties
 
 plugins {
     id("delta.android.application")
@@ -28,13 +29,30 @@ fun org.gradle.api.Project.gradleBoolean(name: String, default: Boolean): Boolea
 fun String.asBuildConfigString(): String =
     "\"" + replace("\\", "\\\\").replace("\"", "\\\"") + "\""
 
+fun org.gradle.api.Project.loadReleaseSigningProperties(): Properties {
+    val props = Properties()
+    val signingFile = file("key/signing.properties")
+    if (signingFile.exists()) {
+        signingFile.inputStream().use { stream -> props.load(stream) }
+    }
+    return props
+}
+
+fun org.gradle.api.Project.releaseSigningValue(
+    props: Properties,
+    propertyKey: String,
+    gradlePropertyKey: String,
+): String? =
+    props.getProperty(propertyKey)?.trim()?.takeIf { it.isNotEmpty() }
+        ?: providers.gradleProperty(gradlePropertyKey).orNull?.trim()?.takeIf { it.isNotEmpty() }
+
 android {
     namespace = "com.delta.helper"
 
     defaultConfig {
         applicationId = "com.delta.helper"
-        versionCode = getGitCommitCount()
-        versionName = "1.0.${getGitCommitCount()}"
+        versionCode = 100
+        versionName = "1.0.0"
 
         buildConfigField("String", "CLIENT_CHANNEL", "\"official\"")
         buildConfigField(
@@ -48,13 +66,17 @@ android {
 
     signingConfigs {
         create("release") {
-            val storeFilePath = providers.gradleProperty("RELEASE_STORE_FILE").orNull?.trim()
-            if (!storeFilePath.isNullOrEmpty()) {
-                storeFile = rootProject.file(storeFilePath)
-                storePassword = providers.gradleProperty("RELEASE_STORE_PASSWORD").orNull
-                keyAlias = providers.gradleProperty("RELEASE_KEY_ALIAS").orNull
-                keyPassword = providers.gradleProperty("RELEASE_KEY_PASSWORD").orNull
+            val signingProps = loadReleaseSigningProperties()
+            val storeFilePath = releaseSigningValue(signingProps, "storeFile", "RELEASE_STORE_FILE")
+                ?: "key/key.jks"
+            storeFile = when {
+                storeFilePath.startsWith("/") -> file(storeFilePath)
+                rootProject.file(storeFilePath).exists() -> rootProject.file(storeFilePath)
+                else -> file(storeFilePath)
             }
+            storePassword = releaseSigningValue(signingProps, "storePassword", "RELEASE_STORE_PASSWORD")
+            keyAlias = releaseSigningValue(signingProps, "keyAlias", "RELEASE_KEY_ALIAS")
+            keyPassword = releaseSigningValue(signingProps, "keyPassword", "RELEASE_KEY_PASSWORD")
         }
     }
 

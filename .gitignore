@@ -8,3 +8,6 @@ gradle.properties.local
 captures
 .externalNativeBuild
 .cxx
+/apps/delta-helper-app/release/
+apps/delta-helper-app/key/*.jks
+apps/delta-helper-app/key/signing.properties

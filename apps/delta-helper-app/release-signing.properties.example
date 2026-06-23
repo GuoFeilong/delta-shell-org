@@ -1,2 +1,2 @@
-# 已合并到仓库根目录 gradle.properties.local.example
-# 请复制为 gradle.properties.local 后配置 RELEASE_STORE_* 与 onlineApiBaseUrl
+# 已迁移至 key/signing.properties.example
+# 复制为 key/signing.properties 后填写密码与别名即可用于 *Release 打包。

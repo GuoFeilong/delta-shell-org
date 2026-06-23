@@ -48,10 +48,13 @@ onlineApiBaseUrl=https://api.hzgsapp.com/
 # releaseHttpLogging=false                 # 所有 *Release 变体
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# Release 签名（onlineRelease 打包）
+# Release 签名（*Release 变体，如 onlineRelease / dailyRelease）
 # ═══════════════════════════════════════════════════════════════════════════════
+#
+# 推荐：apps/delta-helper-app/key/signing.properties（见 key/signing.properties.example）
+# 备选：在 gradle.properties.local 中配置 RELEASE_STORE_*（路径相对仓库根目录）
 
-# RELEASE_STORE_FILE=keystore/release.jks
+# RELEASE_STORE_FILE=apps/delta-helper-app/key/key.jks
 # RELEASE_STORE_PASSWORD=***
-# RELEASE_KEY_ALIAS=***
+# RELEASE_KEY_ALIAS=release
 # RELEASE_KEY_PASSWORD=***

@@ -1,0 +1,9 @@
+# 复制为 signing.properties（同目录，已 gitignore），填入生成 key.jks 时设置的密码与别名。
+#
+# keytool 示例：
+# keytool -genkeypair -v -keystore key.jks -alias release -keyalg RSA -keysize 2048 -validity 10000
+
+storeFile=key.jks
+storePassword=你的密钥库密码
+keyAlias=你的别名
+keyPassword=你的密钥密码
