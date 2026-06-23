@@ -99,9 +99,6 @@ class FloatingOverlayService :
                         onDismiss = {
                             OverlayController.hide(this@FloatingOverlayService)
                         },
-                        onDrag = { deltaX, deltaY ->
-                            updateOverlayPosition(deltaX, deltaY)
-                        },
                     )
                 }
             }
@@ -109,14 +106,6 @@ class FloatingOverlayService :
         windowManager.addView(composeView, layoutParams)
         overlayView = composeView
         OverlayLaunchCoordinator.markOverlayVisible(true)
-    }
-
-    private fun updateOverlayPosition(deltaX: Float, deltaY: Float) {
-        val view = overlayView ?: return
-        val params = overlayLayoutParams ?: return
-        params.x += deltaX.roundToInt()
-        params.y += deltaY.roundToInt()
-        windowManager.updateViewLayout(view, params)
     }
 
     private fun removeOverlay() {

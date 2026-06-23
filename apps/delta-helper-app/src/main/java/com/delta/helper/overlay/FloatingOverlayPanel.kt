@@ -2,7 +2,6 @@ package com.delta.helper.overlay
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -11,7 +10,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.DragHandle
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -20,7 +18,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -37,7 +34,6 @@ private val DividerColor = Color(0x33FFFFFF)
 fun FloatingOverlayPanel(
     session: OverlaySession,
     onDismiss: () -> Unit,
-    onDrag: (deltaX: Float, deltaY: Float) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -48,22 +44,10 @@ fun FloatingOverlayPanel(
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .pointerInput(Unit) {
-                    detectDragGestures { change, dragAmount ->
-                        change.consume()
-                        onDrag(dragAmount.x, dragAmount.y)
-                    }
-                },
+            modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Icon(
-                imageVector = Icons.Default.DragHandle,
-                contentDescription = "Drag overlay",
-                tint = ValueColor.copy(alpha = 0.45f),
-            )
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = "ADAPTATION PROFILE",
@@ -107,7 +91,7 @@ fun FloatingOverlayPanel(
         OverlayDivider()
 
         Text(
-            text = "Drag header to move · Apply settings manually in-game.",
+            text = "Apply settings manually in-game.",
             style = MaterialTheme.typography.labelSmall.copy(
                 color = LabelColor,
                 lineHeight = 16.sp,

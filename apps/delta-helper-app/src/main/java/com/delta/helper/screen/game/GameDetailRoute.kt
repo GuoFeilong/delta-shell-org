@@ -1,6 +1,5 @@
 package com.delta.helper.screen.game
 
-import androidx.activity.ComponentActivity
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -26,7 +25,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.delta.helper.overlay.OverlayController
-import com.delta.helper.overlay.OverlayLaunchCoordinator
 import com.delta.helper.overlay.OverlaySession
 import com.delta.helper.screen.component.GameLaunchDock
 import com.delta.helper.screen.component.HzDeviceInfoCard
@@ -50,20 +48,14 @@ fun GameDetailRoute(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val spec = rememberHelperAdaptiveSpec()
     val context = LocalContext.current
-    val activity = context as? ComponentActivity
     var pendingOverlaySession by remember { mutableStateOf<OverlaySession?>(null) }
-
-    fun showOverlayAndMinimize(session: OverlaySession) {
-        OverlayController.show(context, session)
-        activity?.let(OverlayLaunchCoordinator::enterGameAssistMode)
-    }
 
     val overlayPermissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.StartActivityForResult(),
     ) {
         pendingOverlaySession?.let { session ->
             if (OverlayController.canDrawOverlays(context)) {
-                showOverlayAndMinimize(session)
+                OverlayController.show(context, session)
                 pendingOverlaySession = null
             } else {
                 Toast.makeText(context, "Overlay permission is required", Toast.LENGTH_SHORT).show()
@@ -73,7 +65,7 @@ fun GameDetailRoute(
 
     fun launchOverlay(session: OverlaySession) {
         if (OverlayController.canDrawOverlays(context)) {
-            showOverlayAndMinimize(session)
+            OverlayController.show(context, session)
         } else {
             pendingOverlaySession = session
             overlayPermissionLauncher.launch(OverlayController.overlayPermissionIntent(context))
