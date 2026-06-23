@@ -8,6 +8,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
+import com.delta.features.activation.ui.ActivationGate
+import com.delta.features.activation.ui.ActivationPurchaseUrlEffect
 import com.delta.features.home.ui.HomeRoute
 import com.delta.group.ui.theme.DeltashellorgTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -19,10 +21,13 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             DeltashellorgTheme {
+                ActivationPurchaseUrlEffect()
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    HomeRoute(
-                        modifier = Modifier.padding(innerPadding),
-                    )
+                    ActivationGate(modifier = Modifier.padding(innerPadding)) {
+                        HomeRoute(
+                            modifier = Modifier.fillMaxSize(),
+                        )
+                    }
                 }
             }
         }

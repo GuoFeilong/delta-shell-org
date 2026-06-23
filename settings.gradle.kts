@@ -32,10 +32,12 @@ include(":apps:tv-app")
 // Features
 include(":features:feature-login")
 include(":features:feature-home")
+include(":features:feature-activation")
 include(":features:feature-search")
 
 // Core
 include(":core:core-network")
+include(":core:core-activation")
 include(":core:core-database")
 include(":core:core-designsystem")
 include(":core:core-common")

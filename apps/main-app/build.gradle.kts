@@ -26,6 +26,13 @@ android {
         versionCode = getGitCommitCount()
         versionName = "1.0.${getGitCommitCount()}"
 
+        buildConfigField("String", "CLIENT_CHANNEL", "\"official\"")
+        buildConfigField(
+            "String",
+            "PUBLISHER_KEY",
+            "\"${project.findProperty("publisherKey") ?: "official"}\"",
+        )
+
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -55,11 +62,13 @@ android {
             versionNameSuffix = "-daily"
             buildConfigField("String", "API_BASE_URL", "\"https://daily-api.example.com/\"")
             buildConfigField("String", "API_HOST_HEADER", "\"daily-api.example.com\"")
+            buildConfigField("String", "CLIENT_CHANNEL", "\"daily\"")
         }
         create("online") {
             dimension = "environment"
             buildConfigField("String", "API_BASE_URL", "\"https://api.example.com/\"")
             buildConfigField("String", "API_HOST_HEADER", "\"\"")
+            buildConfigField("String", "CLIENT_CHANNEL", "\"official\"")
         }
     }
     buildFeatures {
@@ -76,8 +85,10 @@ kotlin {
 
 dependencies {
     implementation(project(":features:feature-home"))
+    implementation(project(":features:feature-activation"))
     implementation(project(":core:core-common"))
     implementation(project(":core:core-network"))
+    implementation(project(":core:core-activation"))
 
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)

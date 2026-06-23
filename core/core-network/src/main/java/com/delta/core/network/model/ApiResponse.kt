@@ -13,6 +13,6 @@ data class ApiResponse<T>(
         get() = code == SUCCESS_CODE
 
     companion object {
-        const val SUCCESS_CODE = 0
+        const val SUCCESS_CODE = 200
     }
 }
