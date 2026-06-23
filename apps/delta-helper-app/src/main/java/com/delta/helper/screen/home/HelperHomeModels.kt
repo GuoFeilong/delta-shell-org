@@ -23,10 +23,10 @@ data class GameProfileItem(
 object HelperHomeCopy {
     const val BRAND_LABEL = "GRAPHICS MONSTER"
     const val PAGE_TITLE = "画质怪兽"
-    const val PAGE_SUBTITLE = "专注于游戏画质提升"
-    const val HERO_BADGE = "手游最高画质 · 144 / 165 FPS 方案库"
-    const val FOOTNOTE = "请选择您想改的游戏画质（最高支持 144 / 165 帧率）"
-    const val CARD_QUALITY_LABEL = "最高画质"
+    const val PAGE_SUBTITLE = "游戏画质与帧率参考工具"
+    const val HERO_BADGE = "144 / 165 帧参考方案库（非效果承诺）"
+    const val FOOTNOTE = "请选择要查看参考方案的游戏（144 / 165 帧档位仅供参考）"
+    const val CARD_QUALITY_LABEL = "高画质参考方案"
     const val FPS_144_LABEL = "144 FPS"
     const val FPS_165_LABEL = "165 FPS"
 }

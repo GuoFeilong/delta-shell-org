@@ -43,7 +43,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.delta.helper.screen.game.GameLauncher
-import com.delta.helper.screen.game.fpsActivatedMessage
+import com.delta.helper.screen.game.fpsLaunchNoticeMessage
 import com.delta.helper.screen.game.fpsNumericDisplay
 import com.delta.helper.screen.home.GameId
 import com.delta.helper.ui.theme.HzColors
@@ -156,7 +156,7 @@ fun GameLaunchNoticeHost(
                         title = {
                             FpsActivatedTitle(fpsId = current.fpsId, accent = accent)
                         },
-                        message = fpsActivatedMessage(current.fpsId),
+                        message = fpsLaunchNoticeMessage(current.fpsId),
                         onClick = ::onNoticeClick,
                     )
                 }
@@ -284,7 +284,7 @@ private fun FpsActivatedTitle(
             ),
         )
         Text(
-            text = "FPS",
+            text = "帧参考",
             style = MaterialTheme.typography.labelMedium.copy(
                 fontWeight = FontWeight.SemiBold,
                 color = accent.copy(alpha = 0.85f),

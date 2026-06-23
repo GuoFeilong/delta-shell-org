@@ -9,10 +9,12 @@ data class FpsOption(
 )
 
 object FpsSettingCopy {
-    const val SECTION_TITLE = "画质设置"
-    const val FPS_TITLE = "帧数设置"
-    const val FPS_HINT = "提高可增加画面流畅度；若运行卡顿、发热或耗电量过大，可适当降低"
-    const val PREVIEW_NOTE = "以下为参考方案预览，需在对应游戏内手动调整设置"
+    const val SECTION_TITLE = "画质参考"
+    const val FPS_TITLE = "目标帧率（参考）"
+    const val FPS_HINT =
+        "以下为参考档位；实际帧率取决于设备性能与游戏内设置，需您在游戏中手动调整"
+    const val PREVIEW_NOTE =
+        "本 App 不会修改游戏客户端；请进入游戏后对照方案手动设置，我们不保证达到所选帧率"
 }
 
 val fpsSettingOptions: List<FpsOption> = listOf(
@@ -52,7 +54,7 @@ fun fpsNumericDisplay(fpsId: String): String = when (fpsId) {
     else -> fpsId.removePrefix("fps")
 }
 
-fun fpsActivatedMessage(fpsId: String): String {
+fun fpsLaunchNoticeMessage(fpsId: String): String {
     val fps = fpsNumericDisplay(fpsId)
-    return "${fps} 帧已开启，即将打开游戏"
+    return "已加载 ${fps} 帧参考方案，请进入游戏后按方案手动设置"
 }

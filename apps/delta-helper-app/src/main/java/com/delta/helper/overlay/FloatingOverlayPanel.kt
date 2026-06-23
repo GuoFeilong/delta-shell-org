@@ -69,7 +69,7 @@ fun FloatingOverlayPanel(
                     color = AccentColor,
                 ),
             )
-            OverlayInfoRow(label = "FPS", value = session.fpsTarget, highlight = true)
+            OverlayInfoRow(label = "目标帧率(参考)", value = session.fpsTarget, highlight = true)
             OverlayInfoRow(label = "Resolution", value = session.resolution)
             OverlayInfoRow(label = "Memory", value = session.memory)
         }

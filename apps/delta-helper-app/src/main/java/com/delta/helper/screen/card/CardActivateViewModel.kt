@@ -34,15 +34,21 @@ class CardActivateViewModel @Inject constructor(
         _uiState.update { it.copy(legalAccepted = checked, errorMessage = null) }
     }
 
+    fun onServiceNatureAckChanged(checked: Boolean) {
+        _uiState.update { it.copy(serviceNatureAcknowledged = checked, errorMessage = null) }
+    }
+
     fun activate() {
         val state = _uiState.value
-        if (!state.legalAccepted) {
-            _uiState.update { it.copy(errorMessage = "请先阅读并同意相关协议") }
+        if (!state.legalAccepted || !state.serviceNatureAcknowledged) {
+            _uiState.update {
+                it.copy(errorMessage = "请先阅读并同意相关协议，并确认已理解服务性质")
+            }
             return
         }
         val code = state.cardCode.trim()
         if (code.isEmpty()) {
-            _uiState.update { it.copy(errorMessage = "请输入激活码") }
+            _uiState.update { it.copy(errorMessage = "请输入内容访问码") }
             return
         }
         if (state.isActivating) return
@@ -82,7 +88,7 @@ class CardActivateViewModel @Inject constructor(
     fun purchaseCard() {
         val url = _uiState.value.purchaseUrl?.trim().orEmpty()
         if (url.isEmpty()) {
-            _uiState.update { it.copy(errorMessage = "暂无购卡链接，请联系购买渠道") }
+            _uiState.update { it.copy(errorMessage = CardActivateCopy.NO_PURCHASE_LINK) }
             return
         }
         _uiState.update { it.copy(purchaseConfirmUrl = url) }
@@ -113,6 +119,7 @@ class CardActivateViewModel @Inject constructor(
 data class CardActivateUiState(
     val cardCode: String = "",
     val legalAccepted: Boolean = false,
+    val serviceNatureAcknowledged: Boolean = false,
     val purchaseUrl: String? = null,
     val isActivating: Boolean = false,
     val isActivated: Boolean = false,
@@ -122,5 +129,8 @@ data class CardActivateUiState(
     val showActivateConfirm: Boolean = false,
 ) {
     val canActivate: Boolean
-        get() = legalAccepted && cardCode.isNotBlank() && !isActivating
+        get() = legalAccepted &&
+            serviceNatureAcknowledged &&
+            cardCode.isNotBlank() &&
+            !isActivating
 }

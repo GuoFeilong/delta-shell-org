@@ -37,6 +37,7 @@ import com.delta.helper.screen.component.HzCardInputField
 import com.delta.helper.screen.component.HzConfirmDialog
 import com.delta.helper.screen.component.HzInlineMessage
 import com.delta.helper.screen.component.HzLegalAgreementRow
+import com.delta.helper.screen.component.HzPlainAckRow
 import com.delta.helper.screen.component.HzPrimaryButton
 import com.delta.helper.screen.component.HzSecondaryButton
 import com.delta.helper.screen.component.HzTopBar
@@ -109,6 +110,7 @@ fun CardActivateRoute(
         uiState = uiState,
         onCardCodeChange = viewModel::onCardCodeChanged,
         onLegalCheckedChange = viewModel::onLegalCheckedChanged,
+        onServiceNatureAckChange = viewModel::onServiceNatureAckChanged,
         onOpenLegal = { legalDoc = it },
         onActivateClick = viewModel::activate,
         onPurchaseClick = viewModel::purchaseCard,
@@ -144,6 +146,7 @@ fun CardActivateScreen(
     uiState: CardActivateUiState,
     onCardCodeChange: (String) -> Unit,
     onLegalCheckedChange: (Boolean) -> Unit,
+    onServiceNatureAckChange: (Boolean) -> Unit,
     onOpenLegal: (LegalDocType) -> Unit,
     onActivateClick: () -> Unit,
     onPurchaseClick: () -> Unit,
@@ -213,6 +216,12 @@ fun CardActivateScreen(
                                 checked = uiState.legalAccepted,
                                 onCheckedChange = onLegalCheckedChange,
                                 onOpenLegal = onOpenLegal,
+                            )
+
+                            HzPlainAckRow(
+                                checked = uiState.serviceNatureAcknowledged,
+                                onCheckedChange = onServiceNatureAckChange,
+                                text = CardActivateCopy.SERVICE_NATURE_ACK,
                             )
 
                             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {

@@ -133,6 +133,47 @@ fun HzSecondaryButton(
 }
 
 @Composable
+fun HzPlainAckRow(
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit,
+    text: String,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        modifier = modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        verticalAlignment = Alignment.Top,
+    ) {
+        Box(
+            modifier = Modifier
+                .padding(top = 2.dp)
+                .size(20.dp)
+                .clip(RoundedCornerShape(4.dp))
+                .background(if (checked) HzColors.Primary else HzColors.BgInput)
+                .border(1.dp, if (checked) HzColors.Primary else HzColors.Border, RoundedCornerShape(4.dp))
+                .clickable { onCheckedChange(!checked) },
+            contentAlignment = Alignment.Center,
+        ) {
+            if (checked) {
+                Text(
+                    text = "✓",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = HzColors.TextPrimary,
+                )
+            }
+        }
+        Text(
+            text = text,
+            modifier = Modifier.weight(1f),
+            style = MaterialTheme.typography.bodySmall.copy(
+                color = HzColors.TextMuted,
+                lineHeight = MaterialTheme.typography.bodySmall.lineHeight,
+            ),
+        )
+    }
+}
+
+@Composable
 fun HzLegalAgreementRow(
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit,
