@@ -1,3 +1,5 @@
+import com.android.build.api.variant.BuildConfigField
+
 plugins {
     id("delta.android.application")
     alias(libs.plugins.kotlin.compose)
@@ -17,6 +19,15 @@ fun getGitCommitCount(): Int {
     }
 }
 
+fun org.gradle.api.Project.gradleString(name: String, default: String): String =
+    providers.gradleProperty(name).orNull?.trim()?.takeIf { it.isNotEmpty() } ?: default
+
+fun org.gradle.api.Project.gradleBoolean(name: String, default: Boolean): Boolean =
+    providers.gradleProperty(name).orNull?.trim()?.toBooleanStrictOrNull() ?: default
+
+fun String.asBuildConfigString(): String =
+    "\"" + replace("\\", "\\\\").replace("\"", "\\\"") + "\""
+
 android {
     namespace = "com.delta.helper"
 
@@ -29,26 +40,39 @@ android {
         buildConfigField(
             "String",
             "PUBLISHER_KEY",
-            "\"${project.findProperty("publisherKey") ?: "official"}\"",
+            gradleString("publisherKey", "official").asBuildConfigString(),
         )
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    signingConfigs {
+        create("release") {
+            val storeFilePath = providers.gradleProperty("RELEASE_STORE_FILE").orNull?.trim()
+            if (!storeFilePath.isNullOrEmpty()) {
+                storeFile = rootProject.file(storeFilePath)
+                storePassword = providers.gradleProperty("RELEASE_STORE_PASSWORD").orNull
+                keyAlias = providers.gradleProperty("RELEASE_KEY_ALIAS").orNull
+                keyPassword = providers.gradleProperty("RELEASE_KEY_PASSWORD").orNull
+            }
+        }
     }
 
     buildTypes {
         debug {
             applicationIdSuffix = ".dev"
             versionNameSuffix = "-dev"
-            isMinifyEnabled = true
-            isShrinkResources = true
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro",
-            )
+            isMinifyEnabled = false
+            isShrinkResources = false
         }
         release {
+            isDebuggable = false
             isMinifyEnabled = true
             isShrinkResources = true
+            val releaseSigning = signingConfigs.getByName("release")
+            if (releaseSigning.storeFile?.exists() == true) {
+                signingConfig = releaseSigning
+            }
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro",
@@ -62,33 +86,80 @@ android {
             dimension = "environment"
             applicationIdSuffix = ".daily"
             versionNameSuffix = "-daily"
+            buildConfigField("String", "BUILD_ENV", "\"daily\"")
             buildConfigField(
                 "String",
                 "API_BASE_URL",
-                "\"${project.findProperty("dailyApiBaseUrl") ?: "http://10.0.2.2:8080/"}\"",
+                gradleString("dailyApiBaseUrl", "http://10.0.2.2:8080/").asBuildConfigString(),
             )
             buildConfigField(
                 "String",
                 "API_HOST_HEADER",
-                "\"${project.findProperty("dailyApiHostHeader") ?: ""}\"",
+                gradleString("dailyApiHostHeader", "").asBuildConfigString(),
             )
             buildConfigField("String", "CLIENT_CHANNEL", "\"daily\"")
-            buildConfigField("boolean", "SIMULATE_NOT_ACTIVATED", "true")
-            buildConfigField("boolean", "MOCK_ALREADY_ACTIVATED", "true")
         }
         create("online") {
             dimension = "environment"
-            buildConfigField("String", "API_BASE_URL", "\"https://api.example.com/\"")
-            buildConfigField("String", "API_HOST_HEADER", "\"\"")
+            buildConfigField("String", "BUILD_ENV", "\"online\"")
+            buildConfigField(
+                "String",
+                "API_BASE_URL",
+                gradleString("onlineApiBaseUrl", "https://monster.hk.cn/").asBuildConfigString(),
+            )
+            buildConfigField(
+                "String",
+                "API_HOST_HEADER",
+                gradleString("onlineApiHostHeader", "").asBuildConfigString(),
+            )
             buildConfigField("String", "CLIENT_CHANNEL", "\"official\"")
-            buildConfigField("boolean", "SIMULATE_NOT_ACTIVATED", "false")
-            buildConfigField("boolean", "MOCK_ALREADY_ACTIVATED", "false")
         }
     }
 
     buildFeatures {
         compose = true
         buildConfig = true
+    }
+}
+
+androidComponents {
+    onVariants(androidComponents.selector().all()) { variant ->
+        val environment = variant.productFlavors
+            .firstOrNull { it.first == "environment" }
+            ?.second
+        val isDaily = environment == "daily"
+        val isDebug = variant.buildType == "debug"
+
+        val mockAlreadyActivated = when {
+            !isDaily -> false
+            isDebug -> gradleBoolean("dailyDebugMockAlreadyActivated", true)
+            else -> gradleBoolean("dailyReleaseMockAlreadyActivated", false)
+        }
+        val simulateNotActivated = when {
+            !isDaily -> false
+            isDebug -> gradleBoolean("dailyDebugSimulateNotActivated", true)
+            else -> gradleBoolean("dailyReleaseSimulateNotActivated", false)
+        }
+        val httpLoggingEnabled = if (isDebug) {
+            gradleBoolean("debugHttpLogging", true)
+        } else {
+            gradleBoolean("releaseHttpLogging", false)
+        }
+
+        variant.buildConfigFields?.apply {
+            put(
+                "MOCK_ALREADY_ACTIVATED",
+                BuildConfigField("boolean", mockAlreadyActivated.toString(), null),
+            )
+            put(
+                "SIMULATE_NOT_ACTIVATED",
+                BuildConfigField("boolean", simulateNotActivated.toString(), null),
+            )
+            put(
+                "HTTP_LOGGING_ENABLED",
+                BuildConfigField("boolean", httpLoggingEnabled.toString(), null),
+            )
+        }
     }
 }
 

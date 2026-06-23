@@ -5,6 +5,10 @@ plugins {
 
 android {
     namespace = "com.delta.core.activation"
+
+    defaultConfig {
+        consumerProguardFiles("consumer-rules.pro")
+    }
 }
 
 kotlin {

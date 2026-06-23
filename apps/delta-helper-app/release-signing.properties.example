@@ -1,0 +1,2 @@
+# 已合并到仓库根目录 gradle.properties.local.example
+# 请复制为 gradle.properties.local 后配置 RELEASE_STORE_* 与 onlineApiBaseUrl

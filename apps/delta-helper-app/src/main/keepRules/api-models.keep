@@ -1,0 +1,7 @@
+# API envelope + activation DTOs (Retrofit + kotlinx.serialization)
+-keep @kotlinx.serialization.Serializable class com.delta.core.network.model.** { *; }
+-keep @kotlinx.serialization.Serializable class com.delta.core.activation.model.dto.** { *; }
+-keep class com.delta.core.network.model.**$$serializer { *; }
+-keep class com.delta.core.activation.model.dto.**$$serializer { *; }
+
+-keep,allowobfuscation interface com.delta.core.activation.api.** { *; }
