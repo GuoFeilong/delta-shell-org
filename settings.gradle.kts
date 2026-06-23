@@ -26,6 +26,7 @@ rootProject.name = "delta-shell-org"
 
 // Apps
 include(":apps:main-app")
+include(":apps:delta-helper-app")
 include(":apps:lite-app")
 include(":apps:tv-app")
 
