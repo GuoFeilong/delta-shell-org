@@ -60,7 +60,7 @@ class NetworkConfigBuilder {
         loggingEnabled = enabled
     }
 
-    fun build(): NetworkConfig = NetworkConfig(
+    fun build(): NetworkConfig = DefaultNetworkConfig(
         baseUrl = baseUrl,
         headers = headers.toMap(),
         hostHeader = hostHeader,

@@ -3,33 +3,29 @@ package com.delta.core.network.config
 import java.util.concurrent.TimeUnit
 
 /**
- * Describes how a business module wants its HTTP client configured.
- *
- * Each feature/app module can create its own [NetworkConfig] with a different
- * [baseUrl], [headers], or [hostHeader], then pass it to [com.delta.core.network.factory.NetworkClientFactory].
+ * Network client configuration contract. App/feature modules provide an implementation
+ * (e.g. [com.delta.group.network.AppNetworkConfig]) and bind it via Hilt.
  */
-data class NetworkConfig(
-    val baseUrl: String,
-    val headers: Map<String, String> = emptyMap(),
-    val hostHeader: String? = null,
-    val connectTimeoutSeconds: Long = DEFAULT_CONNECT_TIMEOUT_SECONDS,
-    val readTimeoutSeconds: Long = DEFAULT_READ_TIMEOUT_SECONDS,
-    val writeTimeoutSeconds: Long = DEFAULT_WRITE_TIMEOUT_SECONDS,
-    val loggingEnabled: Boolean = false,
-) {
-    init {
-        require(baseUrl.isNotBlank()) { "baseUrl must not be blank" }
-        require(connectTimeoutSeconds > 0) { "connectTimeoutSeconds must be positive" }
-        require(readTimeoutSeconds > 0) { "readTimeoutSeconds must be positive" }
-        require(writeTimeoutSeconds > 0) { "writeTimeoutSeconds must be positive" }
-    }
+interface NetworkConfig {
+    val baseUrl: String
+    val headers: Map<String, String>
+    val hostHeader: String?
+    val connectTimeoutSeconds: Long
+    val readTimeoutSeconds: Long
+    val writeTimeoutSeconds: Long
+    val loggingEnabled: Boolean
 
     val normalizedBaseUrl: String
         get() = if (baseUrl.endsWith("/")) baseUrl else "$baseUrl/"
 
-    val connectTimeoutMillis: Long = TimeUnit.SECONDS.toMillis(connectTimeoutSeconds)
-    val readTimeoutMillis: Long = TimeUnit.SECONDS.toMillis(readTimeoutSeconds)
-    val writeTimeoutMillis: Long = TimeUnit.SECONDS.toMillis(writeTimeoutSeconds)
+    val connectTimeoutMillis: Long
+        get() = TimeUnit.SECONDS.toMillis(connectTimeoutSeconds)
+
+    val readTimeoutMillis: Long
+        get() = TimeUnit.SECONDS.toMillis(readTimeoutSeconds)
+
+    val writeTimeoutMillis: Long
+        get() = TimeUnit.SECONDS.toMillis(writeTimeoutSeconds)
 
     companion object {
         const val DEFAULT_CONNECT_TIMEOUT_SECONDS = 30L
