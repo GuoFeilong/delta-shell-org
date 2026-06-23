@@ -1,10 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="purple_200">#FFBB86FC</color>
-    <color name="purple_500">#FF6200EE</color>
-    <color name="purple_700">#FF3700B3</color>
-    <color name="teal_200">#FF03DAC5</color>
-    <color name="teal_700">#FF018786</color>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
+    <color name="hz_bg_primary">#FF0F1117</color>
+    <color name="hz_bg_card">#FF1A1F2E</color>
+    <color name="hz_bg_elevated">#FF222838</color>
+    <color name="hz_primary">#FF00D4AA</color>
+    <color name="hz_primary_dark">#FF00A888</color>
+    <color name="hz_primary_light">#FF33DDB8</color>
+    <color name="hz_border">#FF2A3142</color>
+    <color name="hz_bg_input">#FF12151C</color>
+    <color name="hz_text_secondary">#FF8B9299</color>
+    <color name="hz_text_muted">#FF5C6370</color>
+    <color name="hz_warning">#FFFFB020</color>
+    <color name="hz_notice_bg">#0FFFFF0A</color>
+    <color name="hz_notice_border">#40FFB020</color>
 </resources>

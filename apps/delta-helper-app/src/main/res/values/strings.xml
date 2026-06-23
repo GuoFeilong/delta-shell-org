@@ -1,3 +1,5 @@
 <resources>
-    <string name="app_name">Delta Helper</string>
+    <string name="app_name">画质怪兽</string>
+    <string name="splash_brand_en">GRAPHICS MONSTER</string>
+    <string name="splash_brand_subtitle">游戏画质与帧率参考工具</string>
 </resources>
