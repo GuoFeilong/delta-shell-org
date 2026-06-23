@@ -1,6 +1,6 @@
 package com.delta.features.activation.di
 
-import android.content.Context
+import android.app.Application
 import com.delta.core.activation.api.ActivationApi
 import com.delta.core.activation.api.ext.ActivationTasksApi
 import com.delta.core.activation.api.ext.ReleaseGateApi
@@ -17,7 +17,6 @@ import com.delta.core.network.flow.ApiCallExecutor
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
@@ -28,8 +27,8 @@ object ActivationModule {
     @Provides
     @Singleton
     fun provideDeviceIdProvider(
-        @ApplicationContext context: Context,
-    ): DeviceIdProvider = DeviceIdStore(context)
+        application: Application,
+    ): DeviceIdProvider = DeviceIdStore(application)
 
     @Provides
     @Singleton

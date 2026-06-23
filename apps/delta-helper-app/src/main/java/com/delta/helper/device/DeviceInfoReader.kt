@@ -1,20 +1,20 @@
 package com.delta.helper.device
 
 import android.app.ActivityManager
+import android.app.Application
 import android.content.Context
 import android.os.Build
 import android.util.DisplayMetrics
-import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.math.roundToInt
 
 @Singleton
 class DeviceInfoReader @Inject constructor(
-    @ApplicationContext private val context: Context,
+    private val application: Application,
 ) {
     fun read(): DeviceInfo {
-        val metrics = context.resources.displayMetrics
+        val metrics = application.resources.displayMetrics
         val memoryGb = readTotalMemoryGb()
         val cpuCores = Runtime.getRuntime().availableProcessors()
         val performanceScore = estimatePerformanceScore(memoryGb, cpuCores)
@@ -28,13 +28,14 @@ class DeviceInfoReader @Inject constructor(
             screen = "${metrics.widthPixels} × ${metrics.heightPixels}",
             pixelRatio = formatPixelRatio(metrics),
             performanceLabel = tier.label,
+            performanceTier = tier,
             memorySizeGb = memoryGb?.let { formatMemoryGb(it) },
             cpuCores = cpuCores,
         )
     }
 
     private fun readTotalMemoryGb(): Double? {
-        val activityManager = context.getSystemService(Context.ACTIVITY_SERVICE) as? ActivityManager
+        val activityManager = application.getSystemService(Context.ACTIVITY_SERVICE) as? ActivityManager
             ?: return null
         val memoryInfo = ActivityManager.MemoryInfo()
         activityManager.getMemoryInfo(memoryInfo)

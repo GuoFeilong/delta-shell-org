@@ -1,7 +1,9 @@
 [versions]
 # SDK Versions
 compileSdk = "37"
+lifecycleService = "2.11.0"
 minSdk = "28"
+savedstate = "1.5.0"
 targetSdk = "37"
 java = "17"
 
@@ -37,6 +39,8 @@ espressoCore = "3.7.0"
 [libraries]
 android-gradlePlugin = { group = "com.android.tools.build", name = "gradle", version.ref = "agp" }
 androidx-compose-material-icons-extended = { module = "androidx.compose.material:material-icons-extended" }
+androidx-lifecycle-service = { module = "androidx.lifecycle:lifecycle-service", version.ref = "lifecycleService" }
+androidx-savedstate = { module = "androidx.savedstate:savedstate", version.ref = "savedstate" }
 kotlin-gradlePlugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
 compose-compiler-gradlePlugin = { group = "org.jetbrains.kotlin", name = "compose-compiler-gradle-plugin", version.ref = "kotlin" }
 

@@ -71,6 +71,7 @@ android {
             )
             buildConfigField("String", "CLIENT_CHANNEL", "\"daily\"")
             buildConfigField("boolean", "SIMULATE_NOT_ACTIVATED", "true")
+            buildConfigField("boolean", "MOCK_ALREADY_ACTIVATED", "true")
         }
         create("online") {
             dimension = "environment"
@@ -78,6 +79,7 @@ android {
             buildConfigField("String", "API_HOST_HEADER", "\"\"")
             buildConfigField("String", "CLIENT_CHANNEL", "\"official\"")
             buildConfigField("boolean", "SIMULATE_NOT_ACTIVATED", "false")
+            buildConfigField("boolean", "MOCK_ALREADY_ACTIVATED", "false")
         }
     }
 
@@ -108,6 +110,9 @@ dependencies {
     implementation(libs.androidx.compose.material.icons.extended)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.lifecycle.service)
+    implementation(libs.androidx.savedstate)
     implementation(libs.androidx.hilt.navigation.compose)
 
     testImplementation(libs.bundles.test.unit)

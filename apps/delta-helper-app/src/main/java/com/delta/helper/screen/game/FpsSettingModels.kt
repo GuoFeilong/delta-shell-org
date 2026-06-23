@@ -28,3 +28,18 @@ fun defaultFpsForGame(gameId: GameId): String = when (gameId) {
     GameId.PeaceElite -> "fps90"
     GameId.CallOfDuty -> "fps120"
 }
+
+fun fpsLabelEnglish(fpsId: String): String = when (fpsId) {
+    "fps90" -> "90 FPS"
+    "fps120" -> "120 FPS"
+    "fps144" -> "144 FPS"
+    "fps165" -> "165 FPS"
+    else -> fpsId.uppercase()
+}
+
+fun qualityPresetEnglish(fpsId: String): String = when (fpsId) {
+    "fps165", "fps144" -> "ULTRA"
+    "fps120" -> "HIGH"
+    "fps90" -> "BALANCED"
+    else -> "STANDARD"
+}

@@ -4,8 +4,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.delta.helper.device.DeviceInfo
 import com.delta.helper.device.DeviceInfoReader
+import com.delta.helper.overlay.OverlaySession
+import com.delta.helper.overlay.OverlaySessionFactory
 import com.delta.helper.screen.card.ActivationCheckPort
 import com.delta.helper.screen.home.GameId
+import com.delta.helper.screen.home.GameProfileItem
+import com.delta.helper.screen.home.gameProfileFor
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
@@ -20,9 +24,11 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 sealed interface GameDetailEvent {
-    data class ShowToast(val message: String) : GameDetailEvent
+    data class LaunchOverlay(val session: OverlaySession) : GameDetailEvent
 
     data object NavigateToActivation : GameDetailEvent
+
+    data class ShowToast(val message: String) : GameDetailEvent
 }
 
 @HiltViewModel
@@ -36,7 +42,10 @@ class GameDetailViewModel @Inject constructor(
     private val _events = MutableSharedFlow<GameDetailEvent>()
     val events: SharedFlow<GameDetailEvent> = _events.asSharedFlow()
 
+    private var currentGame: GameProfileItem? = null
+
     fun initializeForGame(gameId: GameId) {
+        currentGame = gameProfileFor(gameId)
         _uiState.update {
             it.copy(selectedFpsId = defaultFpsForGame(gameId))
         }
@@ -75,11 +84,30 @@ class GameDetailViewModel @Inject constructor(
             _uiState.update { it.copy(isCheckingActivation = false) }
             when {
                 result.isError -> _events.emit(GameDetailEvent.ShowToast(result.message.orEmpty()))
-                result.activated -> _events.emit(
-                    GameDetailEvent.ShowToast(result.message.orEmpty()),
-                )
+                result.activated -> launchActivatedSession()
                 else -> _events.emit(GameDetailEvent.NavigateToActivation)
             }
+        }
+    }
+
+    fun launchActivatedSession() {
+        viewModelScope.launch {
+            val game = currentGame ?: return@launch
+            val state = _uiState.value
+            val deviceInfo = state.deviceInfo
+            if (deviceInfo == null) {
+                _events.emit(GameDetailEvent.ShowToast("Device info not ready yet"))
+                return@launch
+            }
+            _events.emit(
+                GameDetailEvent.LaunchOverlay(
+                    OverlaySessionFactory.create(
+                        game = game,
+                        selectedFpsId = state.selectedFpsId,
+                        deviceInfo = deviceInfo,
+                    ),
+                ),
+            )
         }
     }
 }

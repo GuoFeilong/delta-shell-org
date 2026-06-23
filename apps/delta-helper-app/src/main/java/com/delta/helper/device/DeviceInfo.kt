@@ -8,17 +8,18 @@ data class DeviceInfo(
     val screen: String,
     val pixelRatio: String,
     val performanceLabel: String,
+    val performanceTier: DevicePerformanceTier,
     val memorySizeGb: String?,
     val cpuCores: Int,
 )
 
-enum class DevicePerformanceTier(val label: String) {
-    Flagship("旗舰"),
-    HighEnd("高端"),
-    MidRange("中端"),
-    Entry("入门"),
-    Low("较低"),
-    Unknown("未知"),
+enum class DevicePerformanceTier(val label: String, val englishLabel: String) {
+    Flagship("旗舰", "Flagship"),
+    HighEnd("高端", "High-End"),
+    MidRange("中端", "Mid-Range"),
+    Entry("入门", "Entry"),
+    Low("较低", "Low"),
+    Unknown("未知", "Unknown"),
     ;
 
     companion object {

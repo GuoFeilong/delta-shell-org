@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
+import com.delta.helper.overlay.OverlayLaunchCoordinator
 import com.delta.helper.screen.HelperRootScreen
 import com.delta.helper.ui.theme.DeltaHelperTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -31,5 +32,10 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        OverlayLaunchCoordinator.restoreDefaultOrientation(this)
     }
 }

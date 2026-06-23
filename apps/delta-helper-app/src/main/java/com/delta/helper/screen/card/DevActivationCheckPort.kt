@@ -15,6 +15,12 @@ class DevActivationCheckPort @Inject constructor(
     private val localSession: LocalActivationSession,
 ) : ActivationCheckPort {
     override suspend fun checkActivation(): ActivationCheckResult {
+        if (BuildConfig.MOCK_ALREADY_ACTIVATED) {
+            return ActivationCheckResult(
+                activated = true,
+                message = RemoteCardActivationPort.ACTIVATED_MESSAGE,
+            )
+        }
         if (!BuildConfig.SIMULATE_NOT_ACTIVATED) {
             return remote.checkActivation()
         }
