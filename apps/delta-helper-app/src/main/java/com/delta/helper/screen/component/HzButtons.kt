@@ -7,6 +7,12 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -225,24 +231,42 @@ fun HzTopBar(
     title: String,
     subtitle: String,
     modifier: Modifier = Modifier,
+    showBack: Boolean = false,
+    onBack: () -> Unit = {},
 ) {
-    Column(
+    Row(
         modifier = modifier
             .fillMaxWidth()
             .padding(top = 8.dp, bottom = 4.dp),
+        verticalAlignment = Alignment.CenterVertically,
     ) {
-        Text(
-            text = subtitle,
-            style = MaterialTheme.typography.labelSmall,
-            color = HzColors.TextMuted,
-            letterSpacing = MaterialTheme.typography.labelSmall.letterSpacing,
-        )
-        Text(
-            text = title,
-            style = MaterialTheme.typography.titleLarge,
-            color = HzColors.TextPrimary,
-            modifier = Modifier.padding(top = 4.dp),
-        )
+        if (showBack) {
+            IconButton(
+                onClick = onBack,
+                modifier = Modifier.size(40.dp),
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = "返回",
+                    tint = HzColors.TextPrimary,
+                )
+            }
+            Spacer(modifier = Modifier.width(4.dp))
+        }
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = subtitle,
+                style = MaterialTheme.typography.labelSmall,
+                color = HzColors.TextMuted,
+                letterSpacing = MaterialTheme.typography.labelSmall.letterSpacing,
+            )
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleLarge,
+                color = HzColors.TextPrimary,
+                modifier = Modifier.padding(top = 4.dp),
+            )
+        }
     }
 }
 

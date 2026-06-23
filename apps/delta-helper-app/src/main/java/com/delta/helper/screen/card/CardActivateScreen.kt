@@ -1,5 +1,6 @@
 package com.delta.helper.screen.card
 
+import androidx.activity.compose.BackHandler
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
@@ -41,18 +42,20 @@ import com.delta.helper.screen.layout.rememberHelperAdaptiveSpec
 import com.delta.helper.screen.legal.LegalCopy
 import com.delta.helper.screen.legal.LegalDocType
 import com.delta.helper.screen.legal.LegalDocumentScreen
-import com.delta.helper.ui.theme.HzColors
 
 @Composable
 fun CardActivateRoute(
     modifier: Modifier = Modifier,
     onActivated: () -> Unit = {},
+    onBack: () -> Unit = {},
     viewModel: CardActivateViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val spec = rememberHelperAdaptiveSpec()
     var legalDoc by rememberSaveable { mutableStateOf<LegalDocType?>(null) }
+
+    BackHandler(enabled = legalDoc == null) { onBack() }
 
     LaunchedEffect(viewModel) {
         viewModel.openPurchaseUrl.collect { url ->
@@ -69,6 +72,7 @@ fun CardActivateRoute(
             initialType = docType,
             onBack = { legalDoc = null },
             modifier = modifier,
+            spec = spec,
         )
         return
     }
@@ -102,6 +106,7 @@ fun CardActivateRoute(
         onOpenLegal = { legalDoc = it },
         onActivateClick = viewModel::activate,
         onPurchaseClick = viewModel::purchaseCard,
+        onBack = onBack,
         modifier = modifier,
         spec = spec,
     )
@@ -136,6 +141,7 @@ fun CardActivateScreen(
     onOpenLegal: (LegalDocType) -> Unit,
     onActivateClick: () -> Unit,
     onPurchaseClick: () -> Unit,
+    onBack: () -> Unit = {},
     modifier: Modifier = Modifier,
     spec: com.delta.helper.screen.layout.HelperAdaptiveSpec = rememberHelperAdaptiveSpec(),
 ) {
@@ -158,6 +164,8 @@ fun CardActivateScreen(
             HzTopBar(
                 title = CardActivateCopy.PAGE_TITLE,
                 subtitle = CardActivateCopy.PAGE_SUBTITLE,
+                showBack = true,
+                onBack = onBack,
             )
 
             HzNoticeBanner(text = CardActivateCopy.PRODUCT_NATURE_SHORT)
@@ -192,19 +200,11 @@ fun CardActivateScreen(
                     enabled = uiState.canActivate,
                 )
 
-                if (!uiState.purchaseUrl.isNullOrBlank()) {
-                    HzSecondaryButton(
-                        text = CardActivateCopy.PURCHASE_BUTTON,
-                        onClick = onPurchaseClick,
-                        enabled = !uiState.isActivating,
-                    )
-                } else {
-                    HzNoticeBanner(
-                        text = CardActivateCopy.NO_PURCHASE_LINK,
-                        backgroundColor = HzColors.BgElevated.copy(alpha = 0.35f),
-                        borderColor = HzColors.Border,
-                    )
-                }
+                HzSecondaryButton(
+                    text = CardActivateCopy.PURCHASE_BUTTON,
+                    onClick = onPurchaseClick,
+                    enabled = !uiState.isActivating,
+                )
             }
 
             uiState.errorMessage?.let { message ->
