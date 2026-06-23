@@ -39,11 +39,14 @@ android {
         debug {
             applicationIdSuffix = ".dev"
             versionNameSuffix = "-dev"
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro",
+            )
         }
         release {
-            optimization {
-                enable = false
-            }
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(
@@ -96,7 +99,6 @@ kotlin {
 }
 
 dependencies {
-    implementation(project(":features:feature-activation"))
     implementation(project(":core:core-common"))
     implementation(project(":core:core-network"))
     implementation(project(":core:core-activation"))
@@ -107,7 +109,6 @@ dependencies {
 
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.bundles.compose)
-    implementation(libs.androidx.compose.material.icons.extended)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.lifecycle.runtime.ktx)

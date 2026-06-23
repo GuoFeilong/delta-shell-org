@@ -26,6 +26,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.delta.helper.overlay.OverlayController
 import com.delta.helper.overlay.OverlaySession
+import com.delta.helper.screen.component.GameLaunchNoticeHost
+import com.delta.helper.screen.component.GameLaunchNoticeSession
 import com.delta.helper.screen.component.GameLaunchDock
 import com.delta.helper.screen.component.HzDeviceInfoCard
 import com.delta.helper.screen.component.HzFpsSettingSection
@@ -49,6 +51,11 @@ fun GameDetailRoute(
     val spec = rememberHelperAdaptiveSpec()
     val context = LocalContext.current
     var pendingOverlaySession by remember { mutableStateOf<OverlaySession?>(null) }
+    var launchNoticeSession by remember { mutableStateOf<GameLaunchNoticeSession?>(null) }
+
+    fun onOverlayLaunched() {
+        launchNoticeSession = GameLaunchNoticeSession(fpsId = uiState.selectedFpsId)
+    }
 
     val overlayPermissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.StartActivityForResult(),
@@ -56,6 +63,7 @@ fun GameDetailRoute(
         pendingOverlaySession?.let { session ->
             if (OverlayController.canDrawOverlays(context)) {
                 OverlayController.show(context, session)
+                onOverlayLaunched()
                 pendingOverlaySession = null
             } else {
                 Toast.makeText(context, "Overlay permission is required", Toast.LENGTH_SHORT).show()
@@ -66,6 +74,7 @@ fun GameDetailRoute(
     fun launchOverlay(session: OverlaySession) {
         if (OverlayController.canDrawOverlays(context)) {
             OverlayController.show(context, session)
+            onOverlayLaunched()
         } else {
             pendingOverlaySession = session
             overlayPermissionLauncher.launch(OverlayController.overlayPermissionIntent(context))
@@ -149,6 +158,16 @@ fun GameDetailRoute(
                     enabled = canLaunch,
                     loading = uiState.isCheckingActivation,
                     onClick = viewModel::onLaunchClick,
+                )
+
+                GameLaunchNoticeHost(
+                    session = launchNoticeSession,
+                    gameId = game.id,
+                    accent = game.accent,
+                    onFinished = { launchNoticeSession = null },
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .padding(horizontal = 20.dp, vertical = 108.dp),
                 )
             }
         }

@@ -43,3 +43,16 @@ fun qualityPresetEnglish(fpsId: String): String = when (fpsId) {
     "fps90" -> "BALANCED"
     else -> "STANDARD"
 }
+
+fun fpsNumericDisplay(fpsId: String): String = when (fpsId) {
+    "fps90" -> "90"
+    "fps120" -> "120"
+    "fps144" -> "144"
+    "fps165" -> "165"
+    else -> fpsId.removePrefix("fps")
+}
+
+fun fpsActivatedMessage(fpsId: String): String {
+    val fps = fpsNumericDisplay(fpsId)
+    return "${fps} 帧已开启，即将打开游戏"
+}

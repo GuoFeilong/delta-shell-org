@@ -1,9 +1,13 @@
 package com.delta.helper.overlay
 
+import android.graphics.Color
 import android.graphics.PixelFormat
 import android.os.Build
 import android.view.Gravity
 import android.view.WindowManager
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.lifecycle.LifecycleService
@@ -73,7 +77,8 @@ class FloatingOverlayService :
             WindowManager.LayoutParams.WRAP_CONTENT,
             WindowManager.LayoutParams.WRAP_CONTENT,
             WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
-            WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL or
+            WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or
+                WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL or
                 WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN,
             PixelFormat.TRANSLUCENT,
         ).apply {
@@ -82,27 +87,30 @@ class FloatingOverlayService :
             y = dpToPx(OVERLAY_MARGIN_Y_DP)
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
                 layoutInDisplayCutoutMode =
-                    WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
+                    WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_DEFAULT
             }
         }
         overlayLayoutParams = layoutParams
 
         val composeView = ComposeView(this).apply {
+            setBackgroundColor(Color.TRANSPARENT)
             setViewTreeLifecycleOwner(this@FloatingOverlayService)
             setViewTreeSavedStateRegistryOwner(this@FloatingOverlayService)
             setViewTreeViewModelStoreOwner(this@FloatingOverlayService)
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnDetachedFromWindow)
             setContent {
                 DeltaHelperTheme {
-                    FloatingOverlayPanel(
-                        session = session,
-                        onDismiss = {
-                            OverlayController.hide(this@FloatingOverlayService)
-                        },
-                        onDrag = { deltaX, deltaY ->
-                            updateOverlayPosition(deltaX, deltaY)
-                        },
-                    )
+                    Box(Modifier.wrapContentSize()) {
+                        FloatingOverlayPanel(
+                            session = session,
+                            onDismiss = {
+                                OverlayController.hide(this@FloatingOverlayService)
+                            },
+                            onDrag = { deltaX, deltaY ->
+                                updateOverlayPosition(deltaX, deltaY)
+                            },
+                        )
+                    }
                 }
             }
         }

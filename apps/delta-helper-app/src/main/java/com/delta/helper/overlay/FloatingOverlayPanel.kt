@@ -7,9 +7,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
@@ -42,6 +43,8 @@ fun FloatingOverlayPanel(
 ) {
     Box(
         modifier = modifier
+            .wrapContentSize()
+            .wrapContentWidth()
             .pointerInput(Unit) {
                 detectDragGestures { change, dragAmount ->
                     change.consume()
@@ -54,8 +57,8 @@ fun FloatingOverlayPanel(
     ) {
         Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(end = 28.dp),
+                .wrapContentWidth()
+                .padding(end = 24.dp),
             verticalArrangement = Arrangement.spacedBy(6.dp),
         ) {
             Text(
@@ -93,7 +96,6 @@ private fun OverlayInfoRow(
     highlight: Boolean = false,
 ) {
     Row(
-        modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(6.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
