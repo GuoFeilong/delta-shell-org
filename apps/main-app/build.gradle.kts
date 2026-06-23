@@ -2,8 +2,10 @@
 plugins {
     id("delta.android.application")
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.hilt)
     alias(libs.plugins.detekt)
     alias(libs.plugins.ktlint)
+    alias(libs.plugins.ksp)
 }
 
 fun getGitCommitCount(): Int {
@@ -51,13 +53,18 @@ android {
             dimension = "environment"
             applicationIdSuffix = ".daily"
             versionNameSuffix = "-daily"
+            buildConfigField("String", "API_BASE_URL", "\"https://daily-api.example.com/\"")
+            buildConfigField("String", "API_HOST_HEADER", "\"daily-api.example.com\"")
         }
         create("online") {
             dimension = "environment"
+            buildConfigField("String", "API_BASE_URL", "\"https://api.example.com/\"")
+            buildConfigField("String", "API_HOST_HEADER", "\"\"")
         }
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
@@ -70,6 +77,10 @@ kotlin {
 dependencies {
     implementation(project(":features:feature-home"))
     implementation(project(":core:core-common"))
+    implementation(project(":core:core-network"))
+
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.compiler)
 
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.bundles.compose)
