@@ -1,5 +1,6 @@
 package com.delta.helper.screen.game
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,10 +13,13 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.delta.helper.screen.component.GameLaunchDock
 import com.delta.helper.screen.component.HzDeviceInfoCard
 import com.delta.helper.screen.component.HzFpsSettingSection
 import com.delta.helper.screen.component.HzTopBar
@@ -35,6 +39,8 @@ fun GameDetailRoute(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val spec = rememberHelperAdaptiveSpec()
+    val context = LocalContext.current
+    val canLaunch = !uiState.deviceLoading && uiState.deviceInfo != null
 
     LaunchedEffect(game.id) {
         viewModel.initializeForGame(game.id)
@@ -48,40 +54,51 @@ fun GameDetailRoute(
             modifier = Modifier.fillMaxSize(),
             spec = spec,
         ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .verticalScroll(rememberScrollState())
-                    .padding(
-                        top = if (spec.isTabletOrFoldExpanded) 24.dp else 8.dp,
-                        bottom = 28.dp,
-                    ),
-                verticalArrangement = Arrangement.spacedBy(20.dp),
-            ) {
-                HzTopBar(
-                    title = game.title,
-                    subtitle = game.tagline.uppercase(),
-                    showBack = true,
-                    onBack = onBack,
-                )
+            Box(modifier = Modifier.fillMaxSize()) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .verticalScroll(rememberScrollState())
+                        .padding(
+                            top = if (spec.isTabletOrFoldExpanded) 24.dp else 8.dp,
+                            bottom = 120.dp,
+                        ),
+                    verticalArrangement = Arrangement.spacedBy(20.dp),
+                ) {
+                    HzTopBar(
+                        title = game.title,
+                        subtitle = game.tagline.uppercase(),
+                        showBack = true,
+                        onBack = onBack,
+                    )
 
-                GameHeroStrip(game = game)
+                    GameHeroStrip(game = game)
 
-                HzDeviceInfoCard(
-                    deviceInfo = uiState.deviceInfo,
-                    loading = uiState.deviceLoading,
-                    errorMessage = uiState.deviceError,
+                    HzDeviceInfoCard(
+                        deviceInfo = uiState.deviceInfo,
+                        loading = uiState.deviceLoading,
+                        errorMessage = uiState.deviceError,
+                        accent = game.accent,
+                    )
+
+                    HzFpsSettingSection(
+                        options = fpsSettingOptions,
+                        selectedId = uiState.selectedFpsId,
+                        onSelect = viewModel::selectFpsLevel,
+                        accent = game.accent,
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+                }
+
+                GameLaunchDock(
+                    modifier = Modifier.align(Alignment.BottomCenter),
                     accent = game.accent,
+                    enabled = canLaunch,
+                    onClick = {
+                        Toast.makeText(context, "START", Toast.LENGTH_SHORT).show()
+                    },
                 )
-
-                HzFpsSettingSection(
-                    options = fpsSettingOptions,
-                    selectedId = uiState.selectedFpsId,
-                    onSelect = viewModel::selectFpsLevel,
-                    accent = game.accent,
-                )
-
-                Spacer(modifier = Modifier.height(8.dp))
             }
         }
     }

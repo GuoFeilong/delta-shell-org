@@ -1,0 +1,5 @@
+# Copy to gradle.properties.local (gitignored) if Gradle picks the wrong JDK.
+# Typical symptom: "jlink executable ... does not exist"
+#
+# macOS + Android Studio:
+# org.gradle.java.home=/Applications/Android Studio.app/Contents/jbr/Contents/Home
