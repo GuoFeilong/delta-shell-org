@@ -4,7 +4,24 @@
 # macOS + Android Studio:
 # org.gradle.java.home=/Applications/Android Studio.app/Contents/jbr/Contents/Home
 #
-# delta-helper-app daily 构建对接本机 delta-api（模拟器访问宿主机）：
+# ── delta-helper-app 本地 delta-api ──────────────────────────────────────────
+#
+# 方案 A（默认，模拟器）：宿主机特殊地址，无需 adb reverse
 # dailyApiBaseUrl=http://10.0.2.2:8080/
+#
+# 方案 B（10.0.2.2 超时 / VPN 干扰时）：先执行 adb reverse，再改用 localhost
+#   adb reverse tcp:8080 tcp:8080
+# dailyApiBaseUrl=http://127.0.0.1:8080/
+#
+# 真机：换成电脑局域网 IP（同一 WiFi）
+# dailyApiBaseUrl=http://192.168.x.x:8080/
+#
 # dailyApiHostHeader=
-# 真机调试时把 10.0.2.2 换成电脑局域网 IP。
+# dailyDebug 已允许 HTTP 明文（src/debug/network_security_config.xml）
+#
+# 连接超时排查：
+# 1. 本机确认服务在跑：lsof -iTCP:8080 -sTCP:LISTEN
+# 2. 本机 curl：curl -H "X-Device-Id: test" -H "X-Client-OS: android" \
+#      -H "X-Client-Channel: daily" http://127.0.0.1:8080/api/v1/activation/cards/purchase-url
+# 3. 模拟器：adb reverse tcp:8080 tcp:8080 && 改用 127.0.0.1
+# 4. 关闭 VPN/代理后重试

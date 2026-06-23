@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Debug-only: allow HTTP to local delta-api (emulator 10.0.2.2, localhost, LAN IP).
+  This file lives under src/debug/ and is not packaged in release builds.
+-->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="true">
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </base-config>
+</network-security-config>

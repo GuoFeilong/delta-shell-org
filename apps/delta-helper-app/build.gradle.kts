@@ -118,3 +118,18 @@ dependencies {
 
     debugImplementation(libs.bundles.compose.debug)
 }
+
+val adbReverseDevApi = tasks.register("adbReverseDevApi") {
+    group = "android"
+    description = "Forward emulator localhost:8080 to host :8080 for local delta-api"
+    doLast {
+        providers.exec {
+            commandLine("adb", "reverse", "tcp:8080", "tcp:8080")
+            isIgnoreExitValue = true
+        }.result.get()
+    }
+}
+
+tasks.matching { it.name == "installDailyDebug" }.configureEach {
+    dependsOn(adbReverseDevApi)
+}
