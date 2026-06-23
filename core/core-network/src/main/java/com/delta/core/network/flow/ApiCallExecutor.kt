@@ -12,8 +12,6 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.withContext
 import retrofit2.HttpException
 import java.io.IOException
-import javax.inject.Inject
-import javax.inject.Singleton
 
 /**
  * Wraps Retrofit suspend calls into [Flow] of [ApiResult].
@@ -24,8 +22,7 @@ import javax.inject.Singleton
  * apiCallExecutor.asEnvelopeFlow { homeApi.feedEnvelope() }
  * ```
  */
-@Singleton
-class ApiCallExecutor @Inject constructor() {
+class ApiCallExecutor {
 
     fun <T> asFlow(
         dispatcher: CoroutineDispatcher = Dispatchers.IO,
