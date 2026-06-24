@@ -132,7 +132,7 @@ android {
             buildConfigField(
                 "String",
                 "API_BASE_URL",
-                gradleString("dailyApiBaseUrl", "http://10.0.2.2:8080/").asBuildConfigString(),
+                gradleString("dailyApiBaseUrl", "https://monster.hk.cn/").asBuildConfigString(),
             )
             buildConfigField(
                 "String",
