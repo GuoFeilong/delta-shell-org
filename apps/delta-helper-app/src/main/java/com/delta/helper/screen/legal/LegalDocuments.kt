@@ -52,6 +52,20 @@ object LegalCopy {
         "· 每张访问码通常仅可使用一次\n\n" +
         "激活即表示您已阅读并同意《付费与激活说明》。"
 
+    const val FIRST_LAUNCH_TITLE = "欢迎使用画质怪兽2026"
+    const val FIRST_LAUNCH_SUBTITLE = "使用前请阅读并确认以下内容"
+    val FIRST_LAUNCH_SUMMARY_BULLETS = listOf(
+        "本 App 为第三方参考工具，提供画质与帧率设置建议、方案查询与教程指引，不会自动修改游戏或手机硬件。",
+        "实际画面与帧率由手机芯片、散热、游戏版本、网络等因素决定，本 App 无法保证达到所选帧率。",
+        "「内容访问码」仅用于解锁 App 内参考内容访问，不是游戏内改帧或性能提升服务。",
+        "我们将按《隐私政策》处理设备信息等数据，用于激活校验与产品改进。",
+    )
+    const val FIRST_LAUNCH_PAYMENT_HINT = "购卡、激活与退款规则详见《付费与激活说明》。"
+    const val FIRST_LAUNCH_LEGAL_PREFIX = "我已阅读并同意"
+    const val FIRST_LAUNCH_AGREE = "同意并继续"
+    const val FIRST_LAUNCH_DECLINE = "不同意并退出"
+    const val FIRST_LAUNCH_VALIDATION_ERROR = "请先阅读并同意相关协议，并确认已理解服务性质"
+
     val docMeta: Map<LegalDocType, LegalDocMeta> = mapOf(
         LegalDocType.User to LegalDocMeta("用户服务协议", "USER AGREEMENT"),
         LegalDocType.Privacy to LegalDocMeta("隐私政策", "PRIVACY POLICY"),

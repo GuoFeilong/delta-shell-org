@@ -24,6 +24,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.zIndex
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.SolidColor
@@ -284,7 +285,9 @@ fun HzTopBar(
         if (showBack) {
             IconButton(
                 onClick = onBack,
-                modifier = Modifier.size(40.dp),
+                modifier = Modifier
+                    .size(48.dp)
+                    .zIndex(1f),
             ) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,

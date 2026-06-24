@@ -1,5 +1,6 @@
 package com.delta.helper.screen.legal
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -28,6 +29,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
+import androidx.compose.foundation.layout.statusBarsPadding
 import com.delta.helper.screen.component.HzNoticeBanner
 import com.delta.helper.screen.component.HzTopBar
 import com.delta.helper.screen.home.HelperHomeBackground
@@ -51,100 +54,108 @@ fun LegalDocumentScreen(
     val scrollState = rememberScrollState()
     val scope = rememberCoroutineScope()
 
+    BackHandler(onBack = onBack)
+
     Box(modifier = modifier.fillMaxSize()) {
         HelperHomeBackground()
 
         HelperAdaptiveContainer(
-            modifier = Modifier.fillMaxSize(),
-            spec = spec,
-        ) {
-        Column(
             modifier = Modifier
                 .fillMaxSize()
-                .verticalScroll(scrollState)
-                .padding(
-                    top = if (spec.isTabletOrFoldExpanded) 24.dp else 8.dp,
-                    bottom = 24.dp,
-                ),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
+                .statusBarsPadding()
+                .zIndex(1f),
+            spec = spec,
         ) {
-            HzTopBar(
-                title = meta.title,
-                subtitle = meta.subtitle,
-                showBack = true,
-                onBack = onBack,
-            )
-
-            HzNoticeBanner(text = LegalCopy.PRODUCT_NATURE_SHORT)
-
-            sections.forEach { section ->
-                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text(
-                        text = section.heading,
-                        style = MaterialTheme.typography.titleMedium,
-                        color = HzColors.TextPrimary,
-                    )
-                    section.paragraphs.forEach { paragraph ->
-                        Text(
-                            text = paragraph,
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = HzColors.TextSecondary,
-                            lineHeight = MaterialTheme.typography.bodyMedium.lineHeight,
-                        )
-                    }
-                }
-            }
-
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(HzColors.BgCard)
-                    .border(1.dp, HzColors.Border, RoundedCornerShape(12.dp))
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-            ) {
-                Text(
-                    text = "相关文档",
-                    style = MaterialTheme.typography.labelMedium,
-                    color = HzColors.TextMuted,
+            Column(modifier = Modifier.fillMaxSize()) {
+                HzTopBar(
+                    title = meta.title,
+                    subtitle = meta.subtitle,
+                    showBack = true,
+                    onBack = onBack,
+                    modifier = Modifier.padding(
+                        top = if (spec.isTabletOrFoldExpanded) 16.dp else 4.dp,
+                        bottom = 4.dp,
+                    ),
                 )
-                FlowRow(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
+
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                        .verticalScroll(scrollState)
+                        .padding(bottom = 24.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
                 ) {
-                    LegalCopy.relatedLinks(docType).forEach { (type, label) ->
-                        Text(
-                            text = label,
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(8.dp))
-                                .border(
-                                    1.dp,
-                                    HzColors.InputCardBorder,
-                                    RoundedCornerShape(8.dp),
+                    HzNoticeBanner(text = LegalCopy.PRODUCT_NATURE_SHORT)
+
+                    sections.forEach { section ->
+                        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                            Text(
+                                text = section.heading,
+                                style = MaterialTheme.typography.titleMedium,
+                                color = HzColors.TextPrimary,
+                            )
+                            section.paragraphs.forEach { paragraph ->
+                                Text(
+                                    text = paragraph,
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = HzColors.TextSecondary,
+                                    lineHeight = MaterialTheme.typography.bodyMedium.lineHeight,
                                 )
-                                .clickable {
-                                    docType = type
-                                    scope.launch { scrollState.scrollTo(0) }
-                                }
-                                .padding(horizontal = 12.dp, vertical = 6.dp),
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = HzColors.Primary,
-                        )
+                            }
+                        }
                     }
+
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(HzColors.BgCard)
+                            .border(1.dp, HzColors.Border, RoundedCornerShape(12.dp))
+                            .padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp),
+                    ) {
+                        Text(
+                            text = "相关文档",
+                            style = MaterialTheme.typography.labelMedium,
+                            color = HzColors.TextMuted,
+                        )
+                        FlowRow(
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            verticalArrangement = Arrangement.spacedBy(8.dp),
+                        ) {
+                            LegalCopy.relatedLinks(docType).forEach { (type, label) ->
+                                Text(
+                                    text = label,
+                                    modifier = Modifier
+                                        .clip(RoundedCornerShape(8.dp))
+                                        .border(
+                                            1.dp,
+                                            HzColors.InputCardBorder,
+                                            RoundedCornerShape(8.dp),
+                                        )
+                                        .clickable {
+                                            docType = type
+                                            scope.launch { scrollState.scrollTo(0) }
+                                        }
+                                        .padding(horizontal = 12.dp, vertical = 6.dp),
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = HzColors.Primary,
+                                )
+                            }
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Text(
+                        text = "更新日期：${LegalCopy.UPDATED_AT} · 协议版本 ${LegalCopy.AGREEMENT_VERSION}",
+                        modifier = Modifier.fillMaxWidth(),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = HzColors.TextMuted,
+                        textAlign = TextAlign.Center,
+                    )
                 }
             }
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Text(
-                text = "更新日期：${LegalCopy.UPDATED_AT} · 协议版本 ${LegalCopy.AGREEMENT_VERSION}",
-                modifier = Modifier.fillMaxWidth(),
-                style = MaterialTheme.typography.labelSmall,
-                color = HzColors.TextMuted,
-                textAlign = TextAlign.Center,
-            )
-        }
         }
     }
 }

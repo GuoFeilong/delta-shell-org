@@ -50,6 +50,23 @@ fun org.gradle.api.Project.releaseSigningValue(
 fun String.capitalizeVariantName(): String =
     replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
 
+fun org.gradle.api.Project.resolveSigningStoreFile(storeFilePath: String): java.io.File {
+    val candidates = listOf(
+        file(storeFilePath),
+        file("key/$storeFilePath"),
+        rootProject.file(storeFilePath),
+        rootProject.file("apps/delta-helper-app/$storeFilePath"),
+        rootProject.file("apps/delta-helper-app/key/$storeFilePath"),
+    )
+    return candidates.firstOrNull { it.exists() } ?: file(storeFilePath)
+}
+
+fun com.android.build.api.dsl.SigningConfig.isReady(): Boolean =
+    storeFile?.exists() == true &&
+        !storePassword.isNullOrBlank() &&
+        !keyAlias.isNullOrBlank() &&
+        !keyPassword.isNullOrBlank()
+
 android {
     namespace = "com.delta.helper"
 
@@ -75,11 +92,7 @@ android {
             val signingProps = loadReleaseSigningProperties()
             val storeFilePath = releaseSigningValue(signingProps, "storeFile", "RELEASE_STORE_FILE")
                 ?: "key/key.jks"
-            storeFile = when {
-                storeFilePath.startsWith("/") -> file(storeFilePath)
-                rootProject.file(storeFilePath).exists() -> rootProject.file(storeFilePath)
-                else -> file(storeFilePath)
-            }
+            storeFile = resolveSigningStoreFile(storeFilePath)
             storePassword = releaseSigningValue(signingProps, "storePassword", "RELEASE_STORE_PASSWORD")
             keyAlias = releaseSigningValue(signingProps, "keyAlias", "RELEASE_KEY_ALIAS")
             keyPassword = releaseSigningValue(signingProps, "keyPassword", "RELEASE_KEY_PASSWORD")
@@ -98,8 +111,9 @@ android {
             isMinifyEnabled = true
             isShrinkResources = true
             val releaseSigning = signingConfigs.getByName("release")
-            if (releaseSigning.storeFile?.exists() == true) {
-                signingConfig = releaseSigning
+            signingConfig = when {
+                releaseSigning.isReady() -> releaseSigning
+                else -> signingConfigs.getByName("debug")
             }
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
