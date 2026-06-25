@@ -7,6 +7,8 @@ package com.delta.helper.screen.card
  * 在此模块提供 App 层实现并替换 [PlaceholderCardActivationPort]。
  */
 interface CardActivationPort {
+    suspend fun fetchPurchaseOptions(): List<CardPurchaseOption>
+
     suspend fun fetchPurchaseUrl(): String?
 
     /** 后端未下发购卡链接时视为关闭激活门禁，App 可直接使用。 */
@@ -14,6 +16,14 @@ interface CardActivationPort {
 
     suspend fun redeemCard(cardCode: String): CardActivationOutcome
 }
+
+data class CardPurchaseOption(
+    val planCode: String,
+    val label: String,
+    val priceDisplay: String?,
+    val purchaseUrl: String,
+    val default: Boolean,
+)
 
 sealed interface CardActivationOutcome {
     data class Success(val message: String) : CardActivationOutcome

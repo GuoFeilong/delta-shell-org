@@ -1,6 +1,7 @@
 package com.delta.core.activation.api
 
 import com.delta.core.activation.model.dto.ActivationStatusDto
+import com.delta.core.activation.model.dto.CardPurchaseOptionsDto
 import com.delta.core.activation.model.dto.CardPurchaseUrlDto
 import com.delta.core.activation.model.dto.CardRedeemRequestDto
 import com.delta.core.network.model.ApiResponse
@@ -29,6 +30,15 @@ interface ActivationApi {
         @Header("X-Client-Version") clientVersion: String? = null,
         @Header("X-Publisher-Key") publisherKey: String? = null,
     ): ApiResponse<CardPurchaseUrlDto>
+
+    @GET(ActivationApiPaths.PURCHASE_OPTIONS)
+    suspend fun getPurchaseOptions(
+        @Header("X-Device-Id") deviceId: String,
+        @Header("X-Client-OS") clientOs: String,
+        @Header("X-Client-Channel") clientChannel: String,
+        @Header("X-Client-Version") clientVersion: String? = null,
+        @Header("X-Publisher-Key") publisherKey: String? = null,
+    ): ApiResponse<CardPurchaseOptionsDto>
 
     @POST(ActivationApiPaths.REDEEM)
     suspend fun redeemCard(

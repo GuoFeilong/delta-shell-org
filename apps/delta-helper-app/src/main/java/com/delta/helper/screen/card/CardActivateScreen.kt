@@ -14,11 +14,14 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Text
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -37,6 +40,7 @@ import com.delta.helper.screen.component.HzConfirmDialog
 import com.delta.helper.screen.component.HzInlineMessage
 import com.delta.helper.screen.component.HzLegalAgreementRow
 import com.delta.helper.screen.component.HzPlainAckRow
+import com.delta.helper.screen.component.HzPlanPicker
 import com.delta.helper.screen.component.HzPrimaryButton
 import com.delta.helper.screen.component.HzSecondaryButton
 import com.delta.helper.screen.component.HzTopBar
@@ -118,7 +122,7 @@ fun CardActivateRoute(
     uiState.purchaseConfirmUrl?.let {
         HzConfirmDialog(
             title = LegalCopy.PURCHASE_CONFIRM_TITLE,
-            message = LegalCopy.PURCHASE_CONFIRM_CONTENT,
+            message = LegalCopy.purchaseConfirmContent(uiState.selectedPlanTitle),
             confirmText = "已知悉",
             dismissText = "取消",
             onConfirm = viewModel::confirmPurchase,
@@ -131,6 +135,7 @@ fun CardActivateRoute(
         onCardCodeChange = viewModel::onCardCodeChanged,
         onLegalCheckedChange = viewModel::onLegalCheckedChanged,
         onServiceNatureAckChange = viewModel::onServiceNatureAckChanged,
+        onPlanSelected = viewModel::onPlanSelected,
         onOpenLegal = { legalDoc = it },
         onActivateClick = viewModel::activate,
         onPurchaseClick = viewModel::purchaseCard,
@@ -160,6 +165,7 @@ fun CardActivateScreen(
     onCardCodeChange: (String) -> Unit,
     onLegalCheckedChange: (Boolean) -> Unit,
     onServiceNatureAckChange: (Boolean) -> Unit,
+    onPlanSelected: (Int) -> Unit,
     onOpenLegal: (LegalDocType) -> Unit,
     onActivateClick: () -> Unit,
     onPurchaseClick: () -> Unit,
@@ -237,6 +243,14 @@ fun CardActivateScreen(
                                 text = CardActivateCopy.SERVICE_NATURE_ACK,
                             )
 
+                            if (uiState.purchaseOptions.isNotEmpty()) {
+                                HzPlanPicker(
+                                    options = uiState.purchaseOptions,
+                                    selectedIndex = uiState.selectedPlanIndex,
+                                    onSelected = onPlanSelected,
+                                )
+                            }
+
                             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                                 HzPrimaryButton(
                                     text = if (uiState.isActivating) {
@@ -248,11 +262,23 @@ fun CardActivateScreen(
                                     enabled = uiState.canActivate,
                                 )
 
-                                HzSecondaryButton(
-                                    text = CardActivateCopy.PURCHASE_BUTTON,
-                                    onClick = onPurchaseClick,
-                                    enabled = !uiState.isActivating,
-                                )
+                                if (!uiState.selectedPurchaseUrl.isNullOrBlank()) {
+                                    uiState.selectedPlanHint?.let { hint ->
+                                        Text(
+                                            text = hint,
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = com.delta.helper.ui.theme.HzColors.TextMuted,
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .padding(bottom = 2.dp),
+                                        )
+                                    }
+                                    HzSecondaryButton(
+                                        text = uiState.purchaseButtonText,
+                                        onClick = onPurchaseClick,
+                                        enabled = !uiState.isActivating,
+                                    )
+                                }
                             }
 
                             uiState.errorMessage?.let { message ->

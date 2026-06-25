@@ -30,6 +30,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.delta.helper.activation.HelperActivationUiState
+import com.delta.helper.screen.component.HzActivationAccessBanner
 import com.delta.helper.screen.home.GameId
 import com.delta.helper.screen.home.GameProfileCard
 import com.delta.helper.screen.home.GameProfileItem
@@ -46,7 +48,9 @@ import kotlin.time.Duration.Companion.milliseconds
 @Composable
 fun HelperHomeScreen(
     modifier: Modifier = Modifier,
+    activationState: HelperActivationUiState = HelperActivationUiState(),
     onGameSelected: (GameId) -> Unit = {},
+    onRequireActivation: () -> Unit = {},
 ) {
     val spec = rememberHelperAdaptiveSpec()
     var visible by remember { mutableStateOf(false) }
@@ -77,6 +81,19 @@ fun HelperHomeScreen(
                     enter = fadeIn(tween(500)) + slideInVertically(tween(500)) { it / 4 },
                 ) {
                     HelperHomeHero()
+                }
+
+                if (activationState.gateEnabled) {
+                    Spacer(modifier = Modifier.height(16.dp))
+                    AnimatedVisibility(
+                        visible = visible,
+                        enter = fadeIn(tween(520, delayMillis = 60)),
+                    ) {
+                        HzActivationAccessBanner(
+                            state = activationState,
+                            onClick = onRequireActivation,
+                        )
+                    }
                 }
 
                 Spacer(modifier = Modifier.height(24.dp))

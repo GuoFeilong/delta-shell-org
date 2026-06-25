@@ -5,6 +5,8 @@ import javax.inject.Singleton
 
 @Singleton
 class PlaceholderCardActivationPort @Inject constructor() : CardActivationPort {
+    override suspend fun fetchPurchaseOptions(): List<CardPurchaseOption> = emptyList()
+
     override suspend fun fetchPurchaseUrl(): String? = null
 
     override suspend fun isActivationGateEnabled(): Boolean = false

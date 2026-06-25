@@ -9,6 +9,9 @@ data class ActivationStatus(
     val clientChannel: String?,
     val activatedAt: String?,
     val appPackageName: String?,
+    val planCode: String? = null,
+    val accessExpiresAt: String? = null,
+    val daysRemaining: Long? = null,
 )
 
 enum class ActivationDeviceStatus {
@@ -38,4 +41,16 @@ enum class ActivationSource {
 
 data class CardPurchaseUrl(
     val purchaseUrl: String?,
+)
+
+data class CardPurchaseOption(
+    val planCode: String,
+    val label: String,
+    val priceDisplay: String?,
+    val purchaseUrl: String,
+    val default: Boolean,
+)
+
+data class CardPurchaseOptions(
+    val options: List<CardPurchaseOption>,
 )

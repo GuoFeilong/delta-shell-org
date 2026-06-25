@@ -9,6 +9,7 @@ package com.delta.core.activation.api
 object ActivationApiPaths {
     const val STATUS = "api/v1/activation/status"
     const val PURCHASE_URL = "api/v1/activation/cards/purchase-url"
+    const val PURCHASE_OPTIONS = "api/v1/activation/cards/purchase-options"
     const val REDEEM = "api/v1/activation/cards/redeem"
 
     // --- Extension APIs (release-gate, tasks) ---

@@ -24,11 +24,13 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.delta.helper.activation.HelperActivationUiState
 import com.delta.helper.overlay.OverlayController
 import com.delta.helper.overlay.OverlaySession
 import com.delta.helper.screen.component.GameLaunchNoticeHost
 import com.delta.helper.screen.component.GameLaunchNoticeSession
 import com.delta.helper.screen.component.GameLaunchDock
+import com.delta.helper.screen.component.HzActivationAccessBanner
 import com.delta.helper.screen.component.HzConfirmDialog
 import com.delta.helper.screen.component.HzDeviceInfoCard
 import com.delta.helper.screen.component.HzFpsSettingSection
@@ -47,6 +49,7 @@ fun GameDetailRoute(
     onBack: () -> Unit,
     onRequireActivation: () -> Unit,
     activationLaunchNonce: Int = 0,
+    activationState: HelperActivationUiState = HelperActivationUiState(),
     modifier: Modifier = Modifier,
     viewModel: GameDetailViewModel = hiltViewModel(),
 ) {
@@ -185,6 +188,13 @@ fun GameDetailRoute(
                     )
 
                     GameHeroStrip(game = game)
+
+                    if (activationState.gateEnabled) {
+                        HzActivationAccessBanner(
+                            state = activationState,
+                            onClick = onRequireActivation,
+                        )
+                    }
 
                     HzDeviceInfoCard(
                         deviceInfo = uiState.deviceInfo,

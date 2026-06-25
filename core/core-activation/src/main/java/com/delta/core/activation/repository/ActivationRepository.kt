@@ -4,6 +4,7 @@ import com.delta.core.activation.api.ActivationApi
 import com.delta.core.activation.context.ActivationHeaderFactory
 import com.delta.core.activation.context.toDeviceProfileHeaderMap
 import com.delta.core.activation.model.ActivationStatus
+import com.delta.core.activation.model.CardPurchaseOptions
 import com.delta.core.activation.model.CardPurchaseUrl
 import com.delta.core.activation.model.dto.CardRedeemRequestDto
 import com.delta.core.activation.model.toDomain
@@ -34,6 +35,18 @@ class ActivationRepository(
         apiCallExecutor.asEnvelopeFlow {
             val headers = headerFactory.build()
             activationApi.getPurchaseUrl(
+                deviceId = headers.deviceId,
+                clientOs = headers.clientOs,
+                clientChannel = headers.clientChannel,
+                clientVersion = headers.clientVersion,
+                publisherKey = headers.publisherKey,
+            )
+        }.mapSuccess { it.toDomain() }
+
+    fun getPurchaseOptions(): Flow<ApiResult<CardPurchaseOptions>> =
+        apiCallExecutor.asEnvelopeFlow {
+            val headers = headerFactory.build()
+            activationApi.getPurchaseOptions(
                 deviceId = headers.deviceId,
                 clientOs = headers.clientOs,
                 clientChannel = headers.clientChannel,

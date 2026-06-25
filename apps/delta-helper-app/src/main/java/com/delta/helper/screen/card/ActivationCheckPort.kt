@@ -8,4 +8,6 @@ data class ActivationCheckResult(
     val activated: Boolean,
     val message: String? = null,
     val isError: Boolean = false,
+    val statusSummary: String? = null,
+    val accessLine: String? = null,
 )

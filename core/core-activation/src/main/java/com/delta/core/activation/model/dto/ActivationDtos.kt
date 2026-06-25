@@ -13,11 +13,28 @@ data class ActivationStatusDto(
     val wechatOpenid: String? = null,
     val activatedAt: String? = null,
     val appPackageName: String? = null,
+    val planCode: String? = null,
+    val accessExpiresAt: String? = null,
+    val daysRemaining: Long? = null,
 )
 
 @Serializable
 data class CardPurchaseUrlDto(
     val purchaseUrl: String? = null,
+)
+
+@Serializable
+data class CardPurchaseOptionDto(
+    val planCode: String,
+    val label: String,
+    val priceDisplay: String? = null,
+    val purchaseUrl: String,
+    val default: Boolean = false,
+)
+
+@Serializable
+data class CardPurchaseOptionsDto(
+    val options: List<CardPurchaseOptionDto> = emptyList(),
 )
 
 @Serializable
