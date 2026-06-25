@@ -11,6 +11,7 @@ class AppActivationClientContext @Inject constructor() : ActivationClientContext
     override val clientOs: String = ActivationClientDefaults.CLIENT_OS_ANDROID
     override val clientChannel: String = BuildConfig.CLIENT_CHANNEL
     override val clientVersionCode: Int? = BuildConfig.VERSION_CODE
+    override val clientVersionName: String = BuildConfig.VERSION_NAME
     override val publisherKey: String? = BuildConfig.PUBLISHER_KEY
         .trim()
         .takeIf { it.isNotEmpty() }

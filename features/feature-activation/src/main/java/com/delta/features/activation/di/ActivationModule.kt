@@ -6,6 +6,8 @@ import com.delta.core.activation.api.ext.ActivationTasksApi
 import com.delta.core.activation.api.ext.ReleaseGateApi
 import com.delta.core.activation.context.ActivationClientContext
 import com.delta.core.activation.context.ActivationHeaderFactory
+import com.delta.core.activation.context.AndroidDeviceProfileProvider
+import com.delta.core.activation.context.DeviceProfileProvider
 import com.delta.core.activation.device.DeviceIdProvider
 import com.delta.core.activation.device.DeviceIdStore
 import com.delta.core.activation.repository.ActivationRepository
@@ -32,12 +34,18 @@ object ActivationModule {
 
     @Provides
     @Singleton
+    fun provideDeviceProfileProvider(): DeviceProfileProvider = AndroidDeviceProfileProvider()
+
+    @Provides
+    @Singleton
     fun provideActivationHeaderFactory(
         clientContext: ActivationClientContext,
         deviceIdProvider: DeviceIdProvider,
+        deviceProfileProvider: DeviceProfileProvider,
     ): ActivationHeaderFactory = ActivationHeaderFactory(
         clientContext = clientContext,
         deviceIdProvider = deviceIdProvider,
+        deviceProfileProvider = deviceProfileProvider,
     )
 
     @Provides

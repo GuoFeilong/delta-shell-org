@@ -7,6 +7,8 @@ interface ActivationClientContext {
     val clientOs: String
     val clientChannel: String
     val clientVersionCode: Int?
+    val clientVersionName: String?
+        get() = null
     val publisherKey: String?
     val appPackageName: String
 }

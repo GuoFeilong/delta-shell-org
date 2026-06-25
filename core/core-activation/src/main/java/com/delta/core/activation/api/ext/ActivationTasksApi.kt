@@ -11,6 +11,7 @@ import com.delta.core.network.model.ApiResponse
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Header
+import retrofit2.http.HeaderMap
 import retrofit2.http.POST
 import retrofit2.http.Path
 
@@ -22,6 +23,7 @@ interface ActivationTasksApi {
         @Header("X-Client-Channel") clientChannel: String,
         @Header("X-Client-Version") clientVersion: String? = null,
         @Header("X-Publisher-Key") publisherKey: String? = null,
+        @HeaderMap deviceProfileHeaders: Map<String, String> = emptyMap(),
     ): ApiResponse<TaskListDto>
 
     @POST(ActivationApiPaths.TASK_VERIFY)
@@ -33,6 +35,7 @@ interface ActivationTasksApi {
         @Header("X-Client-Channel") clientChannel: String,
         @Header("X-Client-Version") clientVersion: String? = null,
         @Header("X-Publisher-Key") publisherKey: String? = null,
+        @HeaderMap deviceProfileHeaders: Map<String, String> = emptyMap(),
     ): ApiResponse<TaskVerifyResultDto>
 
     @POST(ActivationApiPaths.TASK_STEP_REDEEM)
@@ -44,6 +47,7 @@ interface ActivationTasksApi {
         @Header("X-Client-Channel") clientChannel: String,
         @Header("X-Client-Version") clientVersion: String? = null,
         @Header("X-Publisher-Key") publisherKey: String? = null,
+        @HeaderMap deviceProfileHeaders: Map<String, String> = emptyMap(),
     ): ApiResponse<TaskVerifyResultDto>
 
     @POST(ActivationApiPaths.TASKS_COMPLETE)
@@ -54,5 +58,6 @@ interface ActivationTasksApi {
         @Header("X-Client-Channel") clientChannel: String,
         @Header("X-Client-Version") clientVersion: String? = null,
         @Header("X-Publisher-Key") publisherKey: String? = null,
+        @HeaderMap deviceProfileHeaders: Map<String, String> = emptyMap(),
     ): ApiResponse<ActivationStatusDto>
 }

@@ -2,6 +2,7 @@ package com.delta.core.activation.repository
 
 import com.delta.core.activation.api.ext.ActivationTasksApi
 import com.delta.core.activation.context.ActivationHeaderFactory
+import com.delta.core.activation.context.toDeviceProfileHeaderMap
 import com.delta.core.activation.model.ActivationStatus
 import com.delta.core.activation.model.TaskList
 import com.delta.core.activation.model.TaskVerifyResult
@@ -21,18 +22,21 @@ class ActivationTasksRepository(
     fun listTasks(): Flow<ApiResult<TaskList>> =
         apiCallExecutor.asEnvelopeFlow {
             val headers = headerFactory.build()
+            val profile = headers.toDeviceProfileHeaderMap()
             activationTasksApi.listTasks(
                 deviceId = headers.deviceId,
                 clientOs = headers.clientOs,
                 clientChannel = headers.clientChannel,
                 clientVersion = headers.clientVersion,
                 publisherKey = headers.publisherKey,
+                deviceProfileHeaders = profile,
             )
         }.mapSuccess { it.toDomain() }
 
     fun verifyStep(stepId: Long, answer: String): Flow<ApiResult<TaskVerifyResult>> =
         apiCallExecutor.asEnvelopeFlow {
             val headers = headerFactory.build()
+            val profile = headers.toDeviceProfileHeaderMap()
             activationTasksApi.verifyStep(
                 stepId = stepId,
                 request = TaskVerifyRequestDto(answer = answer.trim()),
@@ -41,12 +45,14 @@ class ActivationTasksRepository(
                 clientChannel = headers.clientChannel,
                 clientVersion = headers.clientVersion,
                 publisherKey = headers.publisherKey,
+                deviceProfileHeaders = profile,
             )
         }.mapSuccess { it.toDomain() }
 
     fun redeemStepCard(stepId: Long, cardCode: String): Flow<ApiResult<TaskVerifyResult>> =
         apiCallExecutor.asEnvelopeFlow {
             val headers = headerFactory.build()
+            val profile = headers.toDeviceProfileHeaderMap()
             activationTasksApi.redeemStepCard(
                 stepId = stepId,
                 request = TaskStepCardRedeemRequestDto(cardCode = cardCode.trim()),
@@ -55,12 +61,14 @@ class ActivationTasksRepository(
                 clientChannel = headers.clientChannel,
                 clientVersion = headers.clientVersion,
                 publisherKey = headers.publisherKey,
+                deviceProfileHeaders = profile,
             )
         }.mapSuccess { it.toDomain() }
 
     fun completeTasks(progressToken: String): Flow<ApiResult<ActivationStatus>> =
         apiCallExecutor.asEnvelopeFlow {
             val headers = headerFactory.build()
+            val profile = headers.toDeviceProfileHeaderMap()
             activationTasksApi.completeTasks(
                 request = TaskCompleteRequestDto(progressToken = progressToken),
                 deviceId = headers.deviceId,
@@ -68,6 +76,7 @@ class ActivationTasksRepository(
                 clientChannel = headers.clientChannel,
                 clientVersion = headers.clientVersion,
                 publisherKey = headers.publisherKey,
+                deviceProfileHeaders = profile,
             )
         }.mapSuccess { it.toDomain() }
 }

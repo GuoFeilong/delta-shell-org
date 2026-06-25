@@ -2,6 +2,7 @@ package com.delta.core.activation.repository
 
 import com.delta.core.activation.api.ActivationApi
 import com.delta.core.activation.context.ActivationHeaderFactory
+import com.delta.core.activation.context.toDeviceProfileHeaderMap
 import com.delta.core.activation.model.ActivationStatus
 import com.delta.core.activation.model.CardPurchaseUrl
 import com.delta.core.activation.model.dto.CardRedeemRequestDto
@@ -22,6 +23,10 @@ class ActivationRepository(
             activationApi.getStatus(
                 deviceId = headers.deviceId,
                 appPackageName = clientContext.appPackageName,
+                clientOs = headers.clientOs,
+                clientChannel = headers.clientChannel,
+                clientVersion = headers.clientVersion,
+                deviceProfileHeaders = headers.toDeviceProfileHeaderMap(),
             )
         }.mapSuccess { it.toDomain() }
 
@@ -51,6 +56,7 @@ class ActivationRepository(
                 clientVersion = headers.clientVersion,
                 publisherKey = headers.publisherKey,
                 appPackageName = clientContext.appPackageName,
+                deviceProfileHeaders = headers.toDeviceProfileHeaderMap(),
             )
         }.mapSuccess { it.toDomain() }
 }

@@ -2,6 +2,7 @@ package com.delta.helper.screen.card
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.delta.helper.activation.DeviceProfileSynchronizer
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -15,6 +16,7 @@ import kotlinx.coroutines.launch
 @HiltViewModel
 class CardActivateViewModel @Inject constructor(
     private val cardActivationPort: CardActivationPort,
+    private val deviceProfileSynchronizer: DeviceProfileSynchronizer,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(CardActivateUiState())
     val uiState: StateFlow<CardActivateUiState> = _uiState.asStateFlow()
@@ -23,6 +25,7 @@ class CardActivateViewModel @Inject constructor(
     val openPurchaseUrl = _openPurchaseUrl.asSharedFlow()
 
     init {
+        deviceProfileSynchronizer.scheduleSync()
         loadPurchaseUrl()
     }
 
