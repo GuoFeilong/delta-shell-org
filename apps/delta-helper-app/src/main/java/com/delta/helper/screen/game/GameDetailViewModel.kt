@@ -28,7 +28,7 @@ sealed interface GameDetailEvent {
 
     data object NavigateToActivation : GameDetailEvent
 
-    data class ShowToast(val message: String) : GameDetailEvent
+    data class ShowSnackbar(val message: String) : GameDetailEvent
 }
 
 @HiltViewModel
@@ -83,7 +83,7 @@ class GameDetailViewModel @Inject constructor(
             val result = activationCheckPort.checkActivation()
             _uiState.update { it.copy(isCheckingActivation = false) }
             when {
-                result.isError -> _events.emit(GameDetailEvent.ShowToast(result.message.orEmpty()))
+                result.isError -> _events.emit(GameDetailEvent.ShowSnackbar(result.message.orEmpty()))
                 result.activated -> launchActivatedSession()
                 else -> _events.emit(GameDetailEvent.NavigateToActivation)
             }
@@ -96,7 +96,7 @@ class GameDetailViewModel @Inject constructor(
             val state = _uiState.value
             val deviceInfo = state.deviceInfo
             if (deviceInfo == null) {
-                _events.emit(GameDetailEvent.ShowToast("Device info not ready yet"))
+                _events.emit(GameDetailEvent.ShowSnackbar("设备信息未就绪"))
                 return@launch
             }
             _events.emit(

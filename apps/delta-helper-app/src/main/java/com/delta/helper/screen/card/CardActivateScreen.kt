@@ -5,7 +5,6 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
-import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
@@ -41,37 +40,65 @@ import com.delta.helper.screen.component.HzPlainAckRow
 import com.delta.helper.screen.component.HzPrimaryButton
 import com.delta.helper.screen.component.HzSecondaryButton
 import com.delta.helper.screen.component.HzTopBar
+import com.delta.helper.screen.component.LocalHzSnackbarHostState
+import com.delta.helper.screen.component.WechatOfficialAccountGuideDialog
 import com.delta.helper.screen.home.HelperHomeBackground
 import com.delta.helper.screen.layout.HelperAdaptiveContainer
 import com.delta.helper.screen.layout.rememberHelperAdaptiveSpec
 import com.delta.helper.screen.legal.LegalCopy
 import com.delta.helper.screen.legal.LegalDocType
 import com.delta.helper.screen.legal.LegalDocumentScreen
+import com.delta.helper.screen.promo.WechatGuideCopy
 import kotlinx.coroutines.delay
 import kotlin.time.Duration.Companion.milliseconds
 
 @Composable
 fun CardActivateRoute(
+    viewModelStoreKey: Int,
     modifier: Modifier = Modifier,
     onActivated: () -> Unit = {},
     onBack: () -> Unit = {},
-    viewModel: CardActivateViewModel = hiltViewModel(),
+    viewModel: CardActivateViewModel = hiltViewModel(key = "card_activate_$viewModelStoreKey"),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
+    val snackbarHostState = LocalHzSnackbarHostState.current
     val spec = rememberHelperAdaptiveSpec()
     var legalDoc by rememberSaveable { mutableStateOf<LegalDocType?>(null) }
-
-    BackHandler(enabled = legalDoc == null) { onBack() }
+    var showWechatGuide by rememberSaveable(viewModelStoreKey) { mutableStateOf(false) }
 
     LaunchedEffect(viewModel) {
-        viewModel.openPurchaseUrl.collect { url ->
-            copyPurchaseLinkAndOpenBrowser(context, url)
+        viewModel.wechatGuideRequests.collect {
+            showWechatGuide = true
         }
     }
 
-    if (uiState.isActivated) {
-        LaunchedEffect(Unit) { onActivated() }
+    BackHandler {
+        when {
+            legalDoc != null -> legalDoc = null
+            showWechatGuide -> {
+                showWechatGuide = false
+                onActivated()
+            }
+            else -> onBack()
+        }
+    }
+
+    LaunchedEffect(viewModel) {
+        viewModel.openPurchaseUrl.collect { url ->
+            val browserOpened = copyPurchaseLinkAndOpenBrowser(context, url)
+            snackbarHostState.showMessage(WechatGuideCopy.purchaseOpenedMessage(browserOpened))
+        }
+    }
+
+    if (showWechatGuide) {
+        WechatOfficialAccountGuideDialog(
+            onDismiss = {
+                showWechatGuide = false
+                onActivated()
+            },
+        )
+        return
     }
 
     legalDoc?.let { docType ->
@@ -120,11 +147,11 @@ fun CardActivateRoute(
     )
 }
 
-private fun copyPurchaseLinkAndOpenBrowser(context: Context, url: String) {
+private fun copyPurchaseLinkAndOpenBrowser(context: Context, url: String): Boolean {
     val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
     clipboard.setPrimaryClip(ClipData.newPlainText("purchase_url", url))
 
-    val browserOpened = runCatching {
+    return runCatching {
         context.startActivity(
             Intent(Intent.ACTION_VIEW, url.toUri()).apply {
                 addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
@@ -132,13 +159,6 @@ private fun copyPurchaseLinkAndOpenBrowser(context: Context, url: String) {
         )
         true
     }.getOrDefault(false)
-
-    val message = if (browserOpened) {
-        "链接已复制，购买页已打开"
-    } else {
-        "链接已复制，请在浏览器打开"
-    }
-    Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
 }
 
 @Composable

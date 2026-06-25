@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.width
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Icon
@@ -84,8 +85,10 @@ fun HzPrimaryButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
+    loading: Boolean = false,
 ) {
-    val alpha = if (enabled) 1f else 0.45f
+    val interactive = enabled && !loading
+    val alpha = if (interactive) 1f else 0.45f
     Box(
         modifier = modifier
             .fillMaxWidth()
@@ -97,14 +100,24 @@ fun HzPrimaryButton(
                 ),
                 alpha = alpha,
             )
-            .clickable(enabled = enabled, onClick = onClick),
+            .clickable(enabled = interactive, onClick = onClick),
         contentAlignment = Alignment.Center,
     ) {
-        Text(
-            text = text,
-            style = MaterialTheme.typography.titleMedium,
-            color = HzColors.TextPrimary.copy(alpha = alpha),
-        )
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            if (loading) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(18.dp),
+                    strokeWidth = 2.dp,
+                    color = HzColors.TextPrimary,
+                )
+                Spacer(modifier = Modifier.width(10.dp))
+            }
+            Text(
+                text = text,
+                style = MaterialTheme.typography.titleMedium,
+                color = HzColors.TextPrimary.copy(alpha = alpha),
+            )
+        }
     }
 }
 

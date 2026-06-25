@@ -24,6 +24,12 @@ fun HelperRootScreen(
     var selectedGameId by rememberSaveable { mutableStateOf<String?>(null) }
     var showActivation by rememberSaveable { mutableStateOf(false) }
     var activationLaunchNonce by rememberSaveable { mutableIntStateOf(0) }
+    var activationScreenKey by rememberSaveable { mutableIntStateOf(0) }
+
+    fun openActivation() {
+        activationScreenKey++
+        showActivation = true
+    }
 
     BackHandler {
         when {
@@ -36,6 +42,7 @@ fun HelperRootScreen(
     when {
         showActivation -> {
             CardActivateRoute(
+                viewModelStoreKey = activationScreenKey,
                 modifier = modifier.fillMaxSize(),
                 onBack = { showActivation = false },
                 onActivated = {
@@ -51,7 +58,7 @@ fun HelperRootScreen(
                 game = game,
                 modifier = modifier.fillMaxSize(),
                 onBack = { selectedGameId = null },
-                onRequireActivation = { showActivation = true },
+                onRequireActivation = { openActivation() },
                 activationLaunchNonce = activationLaunchNonce,
             )
         }

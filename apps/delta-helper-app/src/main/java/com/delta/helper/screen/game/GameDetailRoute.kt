@@ -1,6 +1,5 @@
 package com.delta.helper.screen.game
 
-import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
@@ -17,6 +16,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -29,14 +29,17 @@ import com.delta.helper.overlay.OverlaySession
 import com.delta.helper.screen.component.GameLaunchNoticeHost
 import com.delta.helper.screen.component.GameLaunchNoticeSession
 import com.delta.helper.screen.component.GameLaunchDock
+import com.delta.helper.screen.component.HzConfirmDialog
 import com.delta.helper.screen.component.HzDeviceInfoCard
 import com.delta.helper.screen.component.HzFpsSettingSection
 import com.delta.helper.screen.component.HzTopBar
+import com.delta.helper.screen.component.LocalHzSnackbarHostState
 import com.delta.helper.screen.home.GameHeroStrip
 import com.delta.helper.screen.home.GameProfileItem
 import com.delta.helper.screen.home.HelperHomeBackground
 import com.delta.helper.screen.layout.HelperAdaptiveContainer
 import com.delta.helper.screen.layout.rememberHelperAdaptiveSpec
+import kotlinx.coroutines.launch
 
 @Composable
 fun GameDetailRoute(
@@ -50,25 +53,53 @@ fun GameDetailRoute(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val spec = rememberHelperAdaptiveSpec()
     val context = LocalContext.current
+    val snackbarHostState = LocalHzSnackbarHostState.current
+    val scope = rememberCoroutineScope()
     var pendingOverlaySession by remember { mutableStateOf<OverlaySession?>(null) }
+    var pendingLaunchAfterPermission by remember { mutableStateOf(false) }
+    var showOverlayPermissionDialog by remember { mutableStateOf(false) }
     var launchNoticeSession by remember { mutableStateOf<GameLaunchNoticeSession?>(null) }
 
     fun onOverlayLaunched() {
         launchNoticeSession = GameLaunchNoticeSession(fpsId = uiState.selectedFpsId)
     }
 
+    fun clearOverlayPermissionPending() {
+        pendingOverlaySession = null
+        pendingLaunchAfterPermission = false
+    }
+
+    val canLaunch = !uiState.deviceLoading &&
+        uiState.deviceInfo != null &&
+        !uiState.isCheckingActivation
+
     val overlayPermissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.StartActivityForResult(),
     ) {
-        pendingOverlaySession?.let { session ->
-            if (OverlayController.canDrawOverlays(context)) {
-                OverlayController.show(context, session)
-                onOverlayLaunched()
-                pendingOverlaySession = null
-            } else {
-                Toast.makeText(context, "Overlay permission is required", Toast.LENGTH_SHORT).show()
+        when {
+            OverlayController.canDrawOverlays(context) -> {
+                val session = pendingOverlaySession
+                if (session != null) {
+                    OverlayController.show(context, session)
+                    onOverlayLaunched()
+                    clearOverlayPermissionPending()
+                } else if (pendingLaunchAfterPermission) {
+                    pendingLaunchAfterPermission = false
+                    viewModel.onLaunchClick()
+                }
+            }
+            pendingOverlaySession != null || pendingLaunchAfterPermission -> {
+                clearOverlayPermissionPending()
+                scope.launch {
+                    snackbarHostState.showMessage(GameLaunchCopy.OVERLAY_PERMISSION_REQUIRED)
+                }
             }
         }
+    }
+
+    fun openOverlayPermissionSettings() {
+        showOverlayPermissionDialog = false
+        overlayPermissionLauncher.launch(OverlayController.overlayPermissionIntent(context))
     }
 
     fun launchOverlay(session: OverlaySession) {
@@ -77,13 +108,19 @@ fun GameDetailRoute(
             onOverlayLaunched()
         } else {
             pendingOverlaySession = session
-            overlayPermissionLauncher.launch(OverlayController.overlayPermissionIntent(context))
+            showOverlayPermissionDialog = true
         }
     }
 
-    val canLaunch = !uiState.deviceLoading &&
-        uiState.deviceInfo != null &&
-        !uiState.isCheckingActivation
+    fun onStartClick() {
+        if (!canLaunch) return
+        if (OverlayController.canDrawOverlays(context)) {
+            viewModel.onLaunchClick()
+        } else {
+            pendingLaunchAfterPermission = true
+            showOverlayPermissionDialog = true
+        }
+    }
 
     LaunchedEffect(game.id) {
         viewModel.initializeForGame(game.id)
@@ -99,13 +136,27 @@ fun GameDetailRoute(
     LaunchedEffect(viewModel) {
         viewModel.events.collect { event ->
             when (event) {
-                is GameDetailEvent.ShowToast -> {
-                    Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
+                is GameDetailEvent.ShowSnackbar -> {
+                    snackbarHostState.showMessage(event.message)
                 }
                 is GameDetailEvent.LaunchOverlay -> launchOverlay(event.session)
                 GameDetailEvent.NavigateToActivation -> onRequireActivation()
             }
         }
+    }
+
+    if (showOverlayPermissionDialog) {
+        HzConfirmDialog(
+            title = GameLaunchCopy.OVERLAY_PERMISSION_TITLE,
+            message = GameLaunchCopy.OVERLAY_PERMISSION_MESSAGE,
+            confirmText = GameLaunchCopy.OVERLAY_PERMISSION_CONFIRM,
+            dismissText = GameLaunchCopy.OVERLAY_PERMISSION_DISMISS,
+            onConfirm = ::openOverlayPermissionSettings,
+            onDismiss = {
+                showOverlayPermissionDialog = false
+                clearOverlayPermissionPending()
+            },
+        )
     }
 
     Box(modifier = modifier.fillMaxSize()) {
@@ -157,7 +208,7 @@ fun GameDetailRoute(
                     accent = game.accent,
                     enabled = canLaunch,
                     loading = uiState.isCheckingActivation,
-                    onClick = viewModel::onLaunchClick,
+                    onClick = ::onStartClick,
                 )
 
                 GameLaunchNoticeHost(

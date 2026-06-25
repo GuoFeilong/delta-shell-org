@@ -4,8 +4,6 @@ import androidx.activity.ComponentActivity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -20,6 +18,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.delta.helper.screen.consent.FirstLaunchConsentRoute
 import com.delta.helper.screen.consent.FirstLaunchConsentViewModel
 import com.delta.helper.screen.splash.CustomSplashScreen
+import com.delta.helper.screen.component.HzScaffoldWithSnackbar
 import com.delta.helper.ui.theme.HzColors
 
 @Composable
@@ -61,14 +60,9 @@ fun AppEntryHost(
         }
 
         else -> {
-            Scaffold(
-                modifier = modifier.fillMaxSize(),
-                containerColor = HzColors.BgPrimary,
-            ) { innerPadding ->
+            HzScaffoldWithSnackbar(modifier = modifier.fillMaxSize()) { innerModifier ->
                 HelperRootScreen(
-                    modifier = Modifier
-                        .padding(innerPadding)
-                        .fillMaxSize(),
+                    modifier = innerModifier.fillMaxSize(),
                 )
             }
         }
