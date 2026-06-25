@@ -56,10 +56,10 @@ fun WechatOfficialAccountGuideDialog(
                 )
             }
             isSaving = false
+            onDismiss()
             if (saved) {
                 snackbarHostState.showMessage(WechatGuideCopy.SAVED_TO_ALBUM)
             }
-            onDismiss()
         }
     }
 

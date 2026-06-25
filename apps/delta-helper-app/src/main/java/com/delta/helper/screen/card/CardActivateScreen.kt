@@ -41,7 +41,6 @@ import com.delta.helper.screen.component.HzPrimaryButton
 import com.delta.helper.screen.component.HzSecondaryButton
 import com.delta.helper.screen.component.HzTopBar
 import com.delta.helper.screen.component.LocalHzSnackbarHostState
-import com.delta.helper.screen.component.WechatOfficialAccountGuideDialog
 import com.delta.helper.screen.home.HelperHomeBackground
 import com.delta.helper.screen.layout.HelperAdaptiveContainer
 import com.delta.helper.screen.layout.rememberHelperAdaptiveSpec
@@ -65,21 +64,25 @@ fun CardActivateRoute(
     val snackbarHostState = LocalHzSnackbarHostState.current
     val spec = rememberHelperAdaptiveSpec()
     var legalDoc by rememberSaveable { mutableStateOf<LegalDocType?>(null) }
-    var showWechatGuide by rememberSaveable(viewModelStoreKey) { mutableStateOf(false) }
+    var handledActivationSuccessToken by remember(viewModelStoreKey) { mutableStateOf(0L) }
 
-    LaunchedEffect(viewModel) {
-        viewModel.wechatGuideRequests.collect {
-            showWechatGuide = true
+    LaunchedEffect(
+        uiState.activationSuccessToken,
+        uiState.isActivating,
+        uiState.showActivateConfirm,
+    ) {
+        val hasNewSuccessfulActivation =
+            uiState.activationSuccessToken > handledActivationSuccessToken &&
+                uiState.successMessage != null
+        if (hasNewSuccessfulActivation && !uiState.isActivating && !uiState.showActivateConfirm) {
+            handledActivationSuccessToken = uiState.activationSuccessToken
+            onActivated()
         }
     }
 
     BackHandler {
         when {
             legalDoc != null -> legalDoc = null
-            showWechatGuide -> {
-                showWechatGuide = false
-                onActivated()
-            }
             else -> onBack()
         }
     }
@@ -89,16 +92,6 @@ fun CardActivateRoute(
             val browserOpened = copyPurchaseLinkAndOpenBrowser(context, url)
             snackbarHostState.showMessage(WechatGuideCopy.purchaseOpenedMessage(browserOpened))
         }
-    }
-
-    if (showWechatGuide) {
-        WechatOfficialAccountGuideDialog(
-            onDismiss = {
-                showWechatGuide = false
-                onActivated()
-            },
-        )
-        return
     }
 
     legalDoc?.let { docType ->

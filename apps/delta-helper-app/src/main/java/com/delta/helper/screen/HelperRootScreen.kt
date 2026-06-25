@@ -12,6 +12,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import com.delta.helper.screen.card.CardActivateRoute
+import com.delta.helper.screen.component.WechatOfficialAccountGuideDialog
 import com.delta.helper.screen.game.GameDetailRoute
 import com.delta.helper.screen.home.GameId
 import com.delta.helper.screen.home.gameProfileFor
@@ -25,6 +26,7 @@ fun HelperRootScreen(
     var showActivation by rememberSaveable { mutableStateOf(false) }
     var activationLaunchNonce by rememberSaveable { mutableIntStateOf(0) }
     var activationScreenKey by rememberSaveable { mutableIntStateOf(0) }
+    var showWechatGuideAfterActivation by rememberSaveable { mutableStateOf(false) }
 
     fun openActivation() {
         activationScreenKey++
@@ -48,6 +50,7 @@ fun HelperRootScreen(
                 onActivated = {
                     showActivation = false
                     activationLaunchNonce++
+                    showWechatGuideAfterActivation = true
                 },
             )
         }
@@ -61,6 +64,13 @@ fun HelperRootScreen(
                 onRequireActivation = { openActivation() },
                 activationLaunchNonce = activationLaunchNonce,
             )
+            if (showWechatGuideAfterActivation) {
+                WechatOfficialAccountGuideDialog(
+                    onDismiss = {
+                        showWechatGuideAfterActivation = false
+                    },
+                )
+            }
         }
 
         else -> {

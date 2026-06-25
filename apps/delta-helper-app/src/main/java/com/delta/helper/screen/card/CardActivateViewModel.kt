@@ -22,9 +22,6 @@ class CardActivateViewModel @Inject constructor(
     private val _openPurchaseUrl = MutableSharedFlow<String>()
     val openPurchaseUrl = _openPurchaseUrl.asSharedFlow()
 
-    private val _wechatGuideRequests = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
-    val wechatGuideRequests = _wechatGuideRequests.asSharedFlow()
-
     init {
         loadPurchaseUrl()
     }
@@ -73,9 +70,9 @@ class CardActivateViewModel @Inject constructor(
                             isActivating = false,
                             isActivated = true,
                             successMessage = outcome.message,
+                            activationSuccessToken = it.activationSuccessToken + 1,
                         )
                     }
-                    _wechatGuideRequests.tryEmit(Unit)
                 }
                 is CardActivationOutcome.Failure -> {
                     _uiState.update {
@@ -131,6 +128,7 @@ data class CardActivateUiState(
     val successMessage: String? = null,
     val purchaseConfirmUrl: String? = null,
     val showActivateConfirm: Boolean = false,
+    val activationSuccessToken: Long = 0L,
 ) {
     val canActivate: Boolean
         get() = legalAccepted &&
