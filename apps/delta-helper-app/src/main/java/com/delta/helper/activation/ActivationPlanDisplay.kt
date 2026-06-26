@@ -8,9 +8,15 @@ data class ActivationPlanDisplay(
     val priceDisplay: String?,
     val isLifetime: Boolean,
     val isDefault: Boolean,
+    /** 营销角标，如永久卡「限时4折」 */
+    val promoBadge: String? = null,
 )
 
 object ActivationPlanDisplayFormatter {
+    /** 永久卡限时促销；活动结束改为 false 即可隐藏 */
+    private const val LIFETIME_PROMO_ENABLED = true
+    private const val LIFETIME_PROMO_LABEL = "限时4折"
+
     private val subtitles = mapOf(
         "MONTH" to "30 天内容访问",
         "QUARTER" to "90 天内容访问",
@@ -34,6 +40,7 @@ object ActivationPlanDisplayFormatter {
             priceDisplay = option.priceDisplay?.trim()?.takeIf { it.isNotEmpty() },
             isLifetime = planCode == "LIFETIME",
             isDefault = option.default,
+            promoBadge = if (planCode == "LIFETIME" && LIFETIME_PROMO_ENABLED) LIFETIME_PROMO_LABEL else null,
         )
     }
 }

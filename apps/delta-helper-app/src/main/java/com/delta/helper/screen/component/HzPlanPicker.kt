@@ -127,7 +127,7 @@ private fun HzPlanPickerCard(
             verticalArrangement = Arrangement.spacedBy(4.dp),
         ) {
             Row(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                horizontalArrangement = Arrangement.spacedBy(6.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
@@ -135,9 +135,12 @@ private fun HzPlanPickerCard(
                     style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold),
                     color = if (selected) HzColors.PrimaryLight else HzColors.TextPrimary,
                 )
-                when {
-                    display.isDefault -> HzPlanBadge(text = "推荐")
-                    display.isLifetime -> HzPlanBadge(text = "尊享", gold = true)
+                if (display.isDefault) {
+                    HzPlanBadge(text = "推荐")
+                }
+                if (display.isLifetime) {
+                    HzPlanBadge(text = "尊享", gold = true)
+                    display.promoBadge?.let { HzPlanBadge(text = it, promo = true) }
                 }
             }
             if (display.subtitle.isNotBlank()) {
@@ -163,15 +166,20 @@ private fun HzPlanPickerCard(
 private fun HzPlanBadge(
     text: String,
     gold: Boolean = false,
+    promo: Boolean = false,
     modifier: Modifier = Modifier,
 ) {
-    val color = if (gold) HzColors.Warning else HzColors.Primary
+    val color = when {
+        promo -> HzColors.PlanPromo
+        gold -> HzColors.Warning
+        else -> HzColors.Primary
+    }
     Text(
         text = text,
         modifier = modifier
             .clip(RoundedCornerShape(999.dp))
-            .background(color.copy(alpha = 0.12f))
-            .border(1.dp, color.copy(alpha = 0.35f), RoundedCornerShape(999.dp))
+            .background(color.copy(alpha = if (promo) 0.16f else 0.12f))
+            .border(1.dp, color.copy(alpha = if (promo) 0.45f else 0.35f), RoundedCornerShape(999.dp))
             .padding(horizontal = 8.dp, vertical = 2.dp),
         style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.SemiBold),
         color = color,

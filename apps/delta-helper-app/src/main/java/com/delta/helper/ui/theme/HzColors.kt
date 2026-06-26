@@ -22,6 +22,12 @@ object HzColors {
     val Warning = Color(0xFFFFB020)
     val Error = Color(0xFFFF4757)
 
+    /** 规格强调色：月卡蓝 · 季卡品牌青 · 年卡金 · 永久紫 */
+    val PlanMonth = Color(0xFF5EB4FF)
+    val PlanYear = Color(0xFFFFB020)
+    val PlanLifetime = Color(0xFFB388FF)
+    val PlanPromo = Color(0xFFFF6B4A)
+
     val NoticeBackground = Color(0x0FFFFF0A)
     val NoticeBorder = Color(0x40FFB020)
     val InputCardBorder = Color(0x4D00D4AA)

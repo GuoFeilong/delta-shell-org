@@ -20,6 +20,8 @@ data class HelperActivationUiState(
     val activated: Boolean = false,
     val statusSummary: String = "",
     val accessLine: String = "",
+    val planCode: String? = null,
+    val bannerSourceLine: String = "",
     val bannerTitle: String = "尚未开通",
     val bannerSubtitle: String = "购买访问码（月/季/年/永久）开通；到期需续费，无自动扣费",
     val showActivateAction: Boolean = true,
@@ -131,11 +133,14 @@ class HelperActivationStatusStore @Inject constructor(
         val status = resolved.status
         val summary = status?.let(ActivationAccessFormatter::formatStatusSummary).orEmpty()
         val accessLine = status?.let(ActivationAccessFormatter::formatAccessExpiry).orEmpty()
+        val sourceLine = status?.let { ActivationAccessFormatter.formatSource(it.source) }.orEmpty()
         _uiState.value = HelperActivationUiState(
             gateEnabled = true,
             activated = true,
             statusSummary = summary,
             accessLine = accessLine,
+            planCode = status?.planCode,
+            bannerSourceLine = sourceLine,
             bannerTitle = "已开通",
             bannerSubtitle = summary.ifBlank { "内容访问已生效" },
             showActivateAction = true,
