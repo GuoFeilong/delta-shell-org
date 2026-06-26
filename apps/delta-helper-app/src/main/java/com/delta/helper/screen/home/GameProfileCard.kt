@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -117,23 +118,28 @@ private fun GameFpsBadges(
     accent: Color,
     modifier: Modifier = Modifier,
 ) {
-    Row(
-        modifier = modifier,
-        horizontalArrangement = Arrangement.spacedBy(6.dp),
-        verticalAlignment = Alignment.CenterVertically,
+    Column(
+        modifier = modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(6.dp),
     ) {
         Text(
             text = HelperHomeCopy.CARD_QUALITY_LABEL,
             style = MaterialTheme.typography.labelSmall,
             color = HzColors.TextSecondary,
+            maxLines = 1,
         )
-        FpsBadge(label = HelperHomeCopy.FPS_144_LABEL, accent = accent)
-        Text(
-            text = "/",
-            style = MaterialTheme.typography.labelSmall,
-            color = HzColors.TextMuted,
-        )
-        FpsBadge(label = HelperHomeCopy.FPS_165_LABEL, accent = accent, emphasized = true)
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            FpsBadge(label = HelperHomeCopy.FPS_144_LABEL, accent = accent)
+            Text(
+                text = "/",
+                style = MaterialTheme.typography.labelSmall,
+                color = HzColors.TextMuted,
+            )
+            FpsBadge(label = HelperHomeCopy.FPS_165_LABEL, accent = accent, emphasized = true)
+        }
     }
 }
 
@@ -146,6 +152,7 @@ private fun FpsBadge(
 ) {
     Box(
         modifier = modifier
+            .wrapContentWidth()
             .clip(RoundedCornerShape(6.dp))
             .background(
                 if (emphasized) accent.copy(alpha = 0.18f) else HzColors.BgInput,
@@ -163,6 +170,8 @@ private fun FpsBadge(
                 fontWeight = if (emphasized) FontWeight.SemiBold else FontWeight.Medium,
             ),
             color = if (emphasized) accent else HzColors.TextSecondary,
+            maxLines = 1,
+            softWrap = false,
         )
     }
 }

@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.delta.helper.ui.theme.HzColors
 
@@ -84,5 +85,7 @@ private fun GameFpsHint(
             .padding(horizontal = 10.dp, vertical = 4.dp),
         style = MaterialTheme.typography.labelSmall,
         color = accent,
+        maxLines = 2,
+        overflow = TextOverflow.Ellipsis,
     )
 }
