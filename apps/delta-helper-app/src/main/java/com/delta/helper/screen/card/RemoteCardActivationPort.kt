@@ -25,6 +25,8 @@ class RemoteCardActivationPort @Inject constructor(
                     planCode = option.planCode,
                     label = option.label,
                     priceDisplay = option.priceDisplay,
+                    originalPriceDisplay = option.originalPriceDisplay,
+                    savingsDisplay = option.savingsDisplay,
                     purchaseUrl = option.purchaseUrl,
                     default = option.default,
                 )

@@ -31,6 +31,8 @@ fun CardPurchaseOptionDto.toDomain(): CardPurchaseOption = CardPurchaseOption(
     planCode = planCode,
     label = label,
     priceDisplay = priceDisplay,
+    originalPriceDisplay = originalPriceDisplay,
+    savingsDisplay = savingsDisplay,
     purchaseUrl = purchaseUrl,
     default = default,
 )

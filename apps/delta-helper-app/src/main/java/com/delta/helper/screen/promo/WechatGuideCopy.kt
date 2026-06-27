@@ -11,7 +11,7 @@ object WechatGuideCopy {
 
     fun purchaseOpenedMessage(browserOpened: Boolean): String =
         if (browserOpened) {
-            "购买页已打开，付完款请返回激活"
+            "购买页已打开，付完款请返回「已有访问码」粘贴并激活"
         } else {
             "链接已复制，请在浏览器购买"
         }

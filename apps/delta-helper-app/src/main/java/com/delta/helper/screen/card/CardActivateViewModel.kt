@@ -46,6 +46,14 @@ class CardActivateViewModel @Inject constructor(
         _uiState.update { it.copy(selectedPlanIndex = index, errorMessage = null) }
     }
 
+    fun onAccessModeChanged(mode: CardActivateAccessMode) {
+        _uiState.update { it.copy(accessMode = mode, errorMessage = null) }
+    }
+
+    fun onTipsExpandedChanged(expanded: Boolean) {
+        _uiState.update { it.copy(tipsExpanded = expanded) }
+    }
+
     fun activate() {
         val state = _uiState.value
         if (!state.legalAccepted || !state.serviceNatureAcknowledged) {
@@ -109,7 +117,12 @@ class CardActivateViewModel @Inject constructor(
 
     fun confirmPurchase() {
         val url = _uiState.value.purchaseConfirmUrl ?: return
-        _uiState.update { it.copy(purchaseConfirmUrl = null) }
+        _uiState.update {
+            it.copy(
+                purchaseConfirmUrl = null,
+                accessMode = CardActivateAccessMode.ACTIVATE,
+            )
+        }
         viewModelScope.launch { _openPurchaseUrl.emit(url) }
     }
 
@@ -119,7 +132,12 @@ class CardActivateViewModel @Inject constructor(
             if (options.isEmpty()) {
                 val fallbackUrl = cardActivationPort.fetchPurchaseUrl()
                 if (fallbackUrl == null) {
-                    _uiState.update { it.copy(purchaseOptions = emptyList()) }
+                    _uiState.update {
+                        it.copy(
+                            purchaseOptions = emptyList(),
+                            accessMode = CardActivateAccessMode.ACTIVATE,
+                        )
+                    }
                 } else {
                     _uiState.update {
                         it.copy(
@@ -128,6 +146,8 @@ class CardActivateViewModel @Inject constructor(
                                     planCode = "LIFETIME",
                                     label = "永久",
                                     priceDisplay = null,
+                                    originalPriceDisplay = null,
+                                    savingsDisplay = null,
                                     purchaseUrl = fallbackUrl,
                                     default = true,
                                 ),
@@ -146,11 +166,14 @@ class CardActivateViewModel @Inject constructor(
                             planCode = option.planCode,
                             label = option.label,
                             priceDisplay = option.priceDisplay,
+                            originalPriceDisplay = option.originalPriceDisplay,
+                            savingsDisplay = option.savingsDisplay,
                             purchaseUrl = option.purchaseUrl,
                             default = option.default,
                         )
                     },
                     selectedPlanIndex = defaultIndex,
+                    accessMode = CardActivateAccessMode.PURCHASE,
                 )
             }
         }
@@ -161,6 +184,8 @@ data class CardPurchaseOptionUi(
     val planCode: String,
     val label: String,
     val priceDisplay: String?,
+    val originalPriceDisplay: String? = null,
+    val savingsDisplay: String? = null,
     val purchaseUrl: String,
     val default: Boolean,
 )
@@ -171,6 +196,8 @@ data class CardActivateUiState(
     val serviceNatureAcknowledged: Boolean = false,
     val purchaseOptions: List<CardPurchaseOptionUi> = emptyList(),
     val selectedPlanIndex: Int = 0,
+    val accessMode: CardActivateAccessMode = CardActivateAccessMode.PURCHASE,
+    val tipsExpanded: Boolean = false,
     val isActivating: Boolean = false,
     val isActivated: Boolean = false,
     val errorMessage: String? = null,
@@ -179,6 +206,9 @@ data class CardActivateUiState(
     val showActivateConfirm: Boolean = false,
     val activationSuccessToken: Long = 0L,
 ) {
+    val hasPurchaseOptions: Boolean
+        get() = purchaseOptions.isNotEmpty()
+
     val selectedPurchaseUrl: String?
         get() = purchaseOptions.getOrNull(selectedPlanIndex)?.purchaseUrl
 
@@ -195,16 +225,23 @@ data class CardActivateUiState(
             return buildString {
                 append("已选：${display.title}")
                 display.priceDisplay?.let { append(" · $it") }
+                display.savingsDisplay?.let { append("（$it）") }
             }
         }
 
     val purchaseButtonText: String
         get() {
-            val title = purchaseOptions.getOrNull(selectedPlanIndex)?.let {
-                ActivationPlanDisplayFormatter.format(it).title
+            val display = purchaseOptions.getOrNull(selectedPlanIndex)?.let {
+                ActivationPlanDisplayFormatter.format(it)
+            } ?: return CardActivateCopy.PURCHASE_BUTTON
+            return when {
+                !display.priceDisplay.isNullOrBlank() -> "${display.priceDisplay} ${CardActivateCopy.PURCHASE_BUTTON}"
+                else -> "购买${display.title}访问码"
             }
-            return if (!title.isNullOrBlank()) "购买${title}激活码" else CardActivateCopy.PURCHASE_BUTTON
         }
+
+    val canPurchase: Boolean
+        get() = !selectedPurchaseUrl.isNullOrBlank() && !isActivating
 
     val canActivate: Boolean
         get() = legalAccepted &&

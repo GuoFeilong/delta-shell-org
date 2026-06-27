@@ -168,14 +168,16 @@ private fun HzAccessPlanBadge(
 fun HzPlanRadioDot(
     selected: Boolean,
     modifier: Modifier = Modifier,
+    accentColor: androidx.compose.ui.graphics.Color = HzColors.Primary,
 ) {
+    val borderColor = if (selected) accentColor else HzColors.Border
     Box(
         modifier = modifier
             .size(20.dp)
             .clip(CircleShape)
             .border(
                 width = 2.dp,
-                color = if (selected) HzColors.Primary else HzColors.Border,
+                color = borderColor,
                 shape = CircleShape,
             ),
         contentAlignment = Alignment.Center,
@@ -185,7 +187,7 @@ fun HzPlanRadioDot(
                 modifier = Modifier
                     .size(10.dp)
                     .clip(CircleShape)
-                    .background(HzColors.Primary),
+                    .background(accentColor),
             )
         }
     }

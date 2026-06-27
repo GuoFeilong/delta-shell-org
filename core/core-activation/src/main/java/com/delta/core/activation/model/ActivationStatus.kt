@@ -47,6 +47,8 @@ data class CardPurchaseOption(
     val planCode: String,
     val label: String,
     val priceDisplay: String?,
+    val originalPriceDisplay: String? = null,
+    val savingsDisplay: String? = null,
     val purchaseUrl: String,
     val default: Boolean,
 )

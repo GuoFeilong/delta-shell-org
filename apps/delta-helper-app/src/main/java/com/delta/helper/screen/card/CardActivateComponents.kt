@@ -2,6 +2,7 @@ package com.delta.helper.screen.card
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,6 +13,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ExpandLess
+import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -21,8 +24,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.text.LinkAnnotation
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.withLink
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import com.delta.helper.ui.theme.HzColors
 
@@ -188,6 +195,154 @@ fun CardActivateNoticeStrip(
             color = HzColors.TextSecondary,
             lineHeight = MaterialTheme.typography.bodySmall.lineHeight,
         )
+    }
+}
+
+@Composable
+fun CardActivateSegmentTabs(
+    selectedMode: CardActivateAccessMode,
+    onModeSelected: (CardActivateAccessMode) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(12.dp))
+            .background(HzColors.BgElevated)
+            .border(1.dp, HzColors.Border, RoundedCornerShape(12.dp))
+            .padding(4.dp),
+        horizontalArrangement = Arrangement.spacedBy(4.dp),
+    ) {
+        CardActivateSegmentTab(
+            text = CardActivateCopy.TAB_PURCHASE,
+            selected = selectedMode == CardActivateAccessMode.PURCHASE,
+            onClick = { onModeSelected(CardActivateAccessMode.PURCHASE) },
+            modifier = Modifier.weight(1f),
+        )
+        CardActivateSegmentTab(
+            text = CardActivateCopy.TAB_ACTIVATE,
+            selected = selectedMode == CardActivateAccessMode.ACTIVATE,
+            onClick = { onModeSelected(CardActivateAccessMode.ACTIVATE) },
+            modifier = Modifier.weight(1f),
+        )
+    }
+}
+
+@Composable
+private fun CardActivateSegmentTab(
+    text: String,
+    selected: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Box(
+        modifier = modifier
+            .clip(RoundedCornerShape(10.dp))
+            .background(
+                if (selected) {
+                    Brush.linearGradient(listOf(HzColors.Primary.copy(alpha = 0.22f), HzColors.BgCard))
+                } else {
+                    Brush.linearGradient(listOf(HzColors.BgElevated, HzColors.BgElevated))
+                },
+            )
+            .border(
+                width = if (selected) 1.dp else 0.dp,
+                color = if (selected) HzColors.Primary.copy(alpha = 0.45f) else HzColors.Border,
+                shape = RoundedCornerShape(10.dp),
+            )
+            .clickable(onClick = onClick)
+            .padding(vertical = 10.dp),
+        contentAlignment = Alignment.Center,
+    ) {
+        Text(
+            text = text,
+            style = MaterialTheme.typography.labelLarge.copy(
+                fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Medium,
+            ),
+            color = if (selected) HzColors.PrimaryLight else HzColors.TextSecondary,
+            textAlign = TextAlign.Center,
+        )
+    }
+}
+
+@Composable
+fun CardActivatePurchaseLegalNote(
+    onOpenPaymentDoc: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(6.dp),
+    ) {
+        Text(
+            text = CardActivateCopy.PURCHASE_LEGAL_HINT,
+            style = MaterialTheme.typography.labelSmall,
+            color = HzColors.TextMuted,
+            lineHeight = MaterialTheme.typography.labelSmall.lineHeight,
+        )
+        Text(
+            text = buildAnnotatedString {
+                append(CardActivateCopy.PURCHASE_PAYMENT_DOC_PREFIX)
+                withLink(
+                    LinkAnnotation.Clickable(
+                        tag = "payment",
+                        linkInteractionListener = { onOpenPaymentDoc() },
+                    ),
+                ) {
+                    withStyle(
+                        MaterialTheme.typography.labelSmall.copy(color = HzColors.Primary).toSpanStyle(),
+                    ) {
+                        append(CardActivateCopy.PURCHASE_PAYMENT_DOC_LINK)
+                    }
+                }
+            },
+            style = MaterialTheme.typography.labelSmall,
+            color = HzColors.TextMuted,
+        )
+    }
+}
+
+@Composable
+fun CardActivateTipsPanel(
+    expanded: Boolean,
+    onExpandedChange: (Boolean) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(14.dp))
+            .background(HzColors.BgCard.copy(alpha = 0.72f))
+            .border(1.dp, HzColors.Border, RoundedCornerShape(14.dp))
+            .clickable { onExpandedChange(!expanded) }
+            .padding(horizontal = 14.dp, vertical = 12.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                text = CardActivateCopy.TIPS_TITLE,
+                style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.SemiBold),
+                color = HzColors.TextSecondary,
+            )
+            Icon(
+                imageVector = if (expanded) Icons.Filled.ExpandLess else Icons.Filled.ExpandMore,
+                contentDescription = if (expanded) "收起" else "展开",
+                tint = HzColors.Primary,
+                modifier = Modifier.size(20.dp),
+            )
+        }
+        if (expanded) {
+            Text(
+                text = CardActivateCopy.TIPS_TEXT,
+                style = MaterialTheme.typography.bodySmall,
+                color = HzColors.TextMuted,
+                lineHeight = MaterialTheme.typography.bodySmall.lineHeight,
+            )
+        }
     }
 }
 
