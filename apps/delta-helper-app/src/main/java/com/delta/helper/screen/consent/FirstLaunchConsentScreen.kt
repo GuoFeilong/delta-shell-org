@@ -26,11 +26,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.delta.helper.screen.component.HzInlineMessage
 import com.delta.helper.screen.component.HzLegalAgreementRow
 import com.delta.helper.screen.component.HzPlainAckRow
 import com.delta.helper.screen.component.HzPrimaryButton
 import com.delta.helper.screen.component.HzSecondaryButton
+import com.delta.helper.screen.component.HzSnackbarMessageEffect
+import com.delta.helper.screen.component.HzSnackbarType
 import com.delta.helper.screen.home.HelperHomeBackground
 import com.delta.helper.screen.layout.HelperAdaptiveContainer
 import com.delta.helper.screen.layout.rememberHelperAdaptiveSpec
@@ -62,6 +63,12 @@ fun FirstLaunchConsentRoute(
         )
         return
     }
+
+    HzSnackbarMessageEffect(
+        message = uiState.errorMessage,
+        type = HzSnackbarType.Error,
+        onConsumed = viewModel::clearErrorMessage,
+    )
 
     FirstLaunchConsentScreen(
         uiState = uiState,
@@ -148,10 +155,6 @@ fun FirstLaunchConsentScreen(
                     onCheckedChange = onServiceNatureAckChange,
                     text = LegalCopy.SERVICE_NATURE_ACK,
                 )
-
-                uiState.errorMessage?.let { message ->
-                    HzInlineMessage(message = message, isError = true)
-                }
 
                 HzPrimaryButton(
                     text = LegalCopy.FIRST_LAUNCH_AGREE,

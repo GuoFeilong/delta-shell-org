@@ -35,6 +35,7 @@ import com.delta.helper.screen.component.HzConfirmDialog
 import com.delta.helper.screen.component.HzDeviceInfoCard
 import com.delta.helper.screen.component.HzFpsSettingSection
 import com.delta.helper.screen.component.HzTopBar
+import com.delta.helper.screen.component.HzSnackbarType
 import com.delta.helper.screen.component.LocalHzSnackbarHostState
 import com.delta.helper.screen.home.GameHeroStrip
 import com.delta.helper.screen.home.GameProfileItem
@@ -94,7 +95,10 @@ fun GameDetailRoute(
             pendingOverlaySession != null || pendingLaunchAfterPermission -> {
                 clearOverlayPermissionPending()
                 scope.launch {
-                    snackbarHostState.showMessage(GameLaunchCopy.OVERLAY_PERMISSION_REQUIRED)
+                    snackbarHostState.showMessage(
+                        message = GameLaunchCopy.OVERLAY_PERMISSION_REQUIRED,
+                        type = HzSnackbarType.Default,
+                    )
                 }
             }
         }
@@ -140,7 +144,10 @@ fun GameDetailRoute(
         viewModel.events.collect { event ->
             when (event) {
                 is GameDetailEvent.ShowSnackbar -> {
-                    snackbarHostState.showMessage(event.message)
+                    snackbarHostState.showMessage(
+                        message = event.message,
+                        type = event.type,
+                    )
                 }
                 is GameDetailEvent.LaunchOverlay -> launchOverlay(event.session)
                 GameDetailEvent.NavigateToActivation -> onRequireActivation()

@@ -42,25 +42,25 @@ fun AppEntryHost(
         viewModel.refreshConsentState()
     }
 
-    when {
-        consentState.isLoading -> {
-            Box(
-                modifier = modifier
-                    .fillMaxSize()
-                    .background(HzColors.BgPrimary),
-            )
-        }
+    HzScaffoldWithSnackbar(modifier = modifier.fillMaxSize()) { innerModifier ->
+        when {
+            consentState.isLoading -> {
+                Box(
+                    modifier = innerModifier
+                        .fillMaxSize()
+                        .background(HzColors.BgPrimary),
+                )
+            }
 
-        consentState.needsConsent -> {
-            FirstLaunchConsentRoute(
-                onDecline = { viewModel.declineAndExit { activity.finishAndRemoveTask() } },
-                modifier = modifier,
-                viewModel = viewModel,
-            )
-        }
+            consentState.needsConsent -> {
+                FirstLaunchConsentRoute(
+                    onDecline = { viewModel.declineAndExit { activity.finishAndRemoveTask() } },
+                    modifier = innerModifier,
+                    viewModel = viewModel,
+                )
+            }
 
-        else -> {
-            HzScaffoldWithSnackbar(modifier = modifier.fillMaxSize()) { innerModifier ->
+            else -> {
                 HelperRootScreen(
                     modifier = innerModifier.fillMaxSize(),
                 )

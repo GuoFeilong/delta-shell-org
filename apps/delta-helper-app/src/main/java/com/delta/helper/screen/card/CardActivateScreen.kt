@@ -40,11 +40,12 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.delta.helper.screen.component.HzCardInputField
 import com.delta.helper.screen.component.HzConfirmDialog
-import com.delta.helper.screen.component.HzInlineMessage
 import com.delta.helper.screen.component.HzLegalAgreementRow
 import com.delta.helper.screen.component.HzPlainAckRow
 import com.delta.helper.screen.component.HzPlanPicker
 import com.delta.helper.screen.component.HzPrimaryButton
+import com.delta.helper.screen.component.HzSnackbarMessageEffect
+import com.delta.helper.screen.component.HzSnackbarType
 import com.delta.helper.screen.component.HzTopBar
 import com.delta.helper.screen.component.LocalHzSnackbarHostState
 import com.delta.helper.screen.home.HelperHomeBackground
@@ -98,9 +99,24 @@ fun CardActivateRoute(
     LaunchedEffect(viewModel) {
         viewModel.openPurchaseUrl.collect { url ->
             val browserOpened = copyPurchaseLinkAndOpenBrowser(context, url)
-            snackbarHostState.showMessage(WechatGuideCopy.purchaseOpenedMessage(browserOpened))
+            snackbarHostState.showMessage(
+                message = WechatGuideCopy.purchaseOpenedMessage(browserOpened),
+                type = HzSnackbarType.Success,
+            )
         }
     }
+
+    HzSnackbarMessageEffect(
+        message = uiState.errorMessage,
+        type = HzSnackbarType.Error,
+        onConsumed = viewModel::clearErrorMessage,
+    )
+
+    HzSnackbarMessageEffect(
+        message = uiState.successMessage,
+        type = HzSnackbarType.Success,
+        onConsumed = viewModel::clearSuccessMessage,
+    )
 
     legalDoc?.let { docType ->
         LegalDocumentScreen(
@@ -257,16 +273,6 @@ fun CardActivateScreen(
                                         onActivateClick = onActivateClick,
                                     )
                                 }
-                            }
-
-                            uiState.errorMessage?.let { message ->
-                                Spacer(modifier = Modifier.height(12.dp))
-                                HzInlineMessage(message = message, isError = true)
-                            }
-
-                            uiState.successMessage?.let { message ->
-                                Spacer(modifier = Modifier.height(12.dp))
-                                HzInlineMessage(message = message, isError = false)
                             }
                         }
 

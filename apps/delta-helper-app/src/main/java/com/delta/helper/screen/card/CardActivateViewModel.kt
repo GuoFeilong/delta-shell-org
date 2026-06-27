@@ -30,6 +30,14 @@ class CardActivateViewModel @Inject constructor(
         loadPurchaseOptions()
     }
 
+    fun clearErrorMessage() {
+        _uiState.update { it.copy(errorMessage = null) }
+    }
+
+    fun clearSuccessMessage() {
+        _uiState.update { it.copy(successMessage = null) }
+    }
+
     fun onCardCodeChanged(value: String) {
         _uiState.update { it.copy(cardCode = value, errorMessage = null) }
     }

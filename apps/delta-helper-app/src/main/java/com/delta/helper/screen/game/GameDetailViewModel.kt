@@ -10,6 +10,7 @@ import com.delta.helper.screen.card.ActivationCheckPort
 import com.delta.helper.screen.home.GameId
 import com.delta.helper.screen.home.GameProfileItem
 import com.delta.helper.screen.home.gameProfileFor
+import com.delta.helper.screen.component.HzSnackbarType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
@@ -28,7 +29,10 @@ sealed interface GameDetailEvent {
 
     data object NavigateToActivation : GameDetailEvent
 
-    data class ShowSnackbar(val message: String) : GameDetailEvent
+    data class ShowSnackbar(
+        val message: String,
+        val type: HzSnackbarType = HzSnackbarType.Error,
+    ) : GameDetailEvent
 }
 
 @HiltViewModel

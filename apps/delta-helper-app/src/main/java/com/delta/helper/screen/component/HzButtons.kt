@@ -326,18 +326,3 @@ fun HzTopBar(
         }
     }
 }
-
-@Composable
-fun HzInlineMessage(
-    message: String,
-    modifier: Modifier = Modifier,
-    isError: Boolean = true,
-) {
-    Text(
-        text = message,
-        modifier = modifier.fillMaxWidth(),
-        style = MaterialTheme.typography.bodySmall,
-        color = if (isError) HzColors.Error else HzColors.Primary,
-        textAlign = TextAlign.Center,
-    )
-}

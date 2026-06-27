@@ -8,19 +8,37 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.delta.helper.ui.theme.HzColors
 import kotlinx.coroutines.launch
 
+enum class HzSnackbarType {
+    Default,
+    Error,
+    Success,
+}
+
 class HzSnackbarHostState internal constructor(
     val snackbarHostState: SnackbarHostState = SnackbarHostState(),
 ) {
-    suspend fun showMessage(message: String) {
+    var lastType by mutableStateOf(HzSnackbarType.Default)
+        private set
+
+    suspend fun showMessage(
+        message: String,
+        type: HzSnackbarType = HzSnackbarType.Default,
+    ) {
         if (message.isBlank()) return
+        lastType = type
         snackbarHostState.showSnackbar(message)
     }
 }
@@ -43,6 +61,31 @@ fun ProvideHzSnackbarHostState(
     }
 }
 
+private data class HzSnackbarColors(
+    val containerColor: Color,
+    val contentColor: Color,
+    val actionColor: Color,
+)
+
+private fun colorsFor(type: HzSnackbarType): HzSnackbarColors =
+    when (type) {
+        HzSnackbarType.Default -> HzSnackbarColors(
+            containerColor = HzColors.BgElevated,
+            contentColor = HzColors.TextPrimary,
+            actionColor = HzColors.Primary,
+        )
+        HzSnackbarType.Error -> HzSnackbarColors(
+            containerColor = Color(0xFF2E1A1E),
+            contentColor = HzColors.TextPrimary,
+            actionColor = HzColors.Error,
+        )
+        HzSnackbarType.Success -> HzSnackbarColors(
+            containerColor = Color(0xFF142822),
+            contentColor = HzColors.TextPrimary,
+            actionColor = HzColors.Primary,
+        )
+    }
+
 @Composable
 fun HzSnackbarHost(
     hostState: HzSnackbarHostState,
@@ -52,13 +95,14 @@ fun HzSnackbarHost(
         hostState = hostState.snackbarHostState,
         modifier = modifier.padding(horizontal = 16.dp, vertical = 12.dp),
         snackbar = { data ->
+            val colors = colorsFor(hostState.lastType)
             Snackbar(
                 snackbarData = data,
                 shape = RoundedCornerShape(14.dp),
-                containerColor = HzColors.BgElevated,
-                contentColor = HzColors.TextPrimary,
-                actionColor = HzColors.Primary,
-                actionContentColor = HzColors.Primary,
+                containerColor = colors.containerColor,
+                contentColor = colors.contentColor,
+                actionColor = colors.actionColor,
+                actionContentColor = colors.actionColor,
                 dismissActionContentColor = HzColors.TextMuted,
             )
         },
@@ -66,12 +110,28 @@ fun HzSnackbarHost(
 }
 
 @Composable
-fun rememberHzSnackbarShow(): (String) -> Unit {
+fun HzSnackbarMessageEffect(
+    message: String?,
+    type: HzSnackbarType = HzSnackbarType.Default,
+    onConsumed: () -> Unit = {},
+) {
+    val snackbarHostState = LocalHzSnackbarHostState.current
+    LaunchedEffect(message) {
+        val text = message?.trim().orEmpty()
+        if (text.isNotEmpty()) {
+            snackbarHostState.showMessage(text, type)
+            onConsumed()
+        }
+    }
+}
+
+@Composable
+fun rememberHzSnackbarShow(): (String, HzSnackbarType) -> Unit {
     val hostState = LocalHzSnackbarHostState.current
     val scope = rememberCoroutineScope()
     return remember(hostState, scope) {
-        { message ->
-            scope.launch { hostState.showMessage(message) }
+        { message, type ->
+            scope.launch { hostState.showMessage(message, type) }
         }
     }
 }

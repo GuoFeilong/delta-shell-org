@@ -65,6 +65,10 @@ class FirstLaunchConsentViewModel @Inject constructor(
         _uiState.update { it.copy(serviceNatureAcknowledged = checked, errorMessage = null) }
     }
 
+    fun clearErrorMessage() {
+        _uiState.update { it.copy(errorMessage = null) }
+    }
+
     fun accept() {
         val state = _uiState.value
         if (!state.canAccept) {
