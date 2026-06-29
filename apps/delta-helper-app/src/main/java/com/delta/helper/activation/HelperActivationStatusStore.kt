@@ -31,6 +31,7 @@ data class HelperActivationUiState(
 class HelperActivationStatusStore @Inject constructor(
     private val activationRepository: ActivationRepository,
     private val activationGateSupport: ActivationGateSupport,
+    private val activationEntranceSupport: ActivationEntranceSupport,
     private val localSession: LocalActivationSession,
 ) {
     private val _uiState = MutableStateFlow(HelperActivationUiState())
@@ -109,7 +110,7 @@ class HelperActivationStatusStore @Inject constructor(
         }
     }
 
-    private fun applyResolvedStatus(resolved: ResolvedActivationStatus) {
+    private suspend fun applyResolvedStatus(resolved: ResolvedActivationStatus) {
         if (!resolved.gateEnabled) {
             _uiState.value = HelperActivationUiState(
                 gateEnabled = false,
@@ -121,12 +122,13 @@ class HelperActivationStatusStore @Inject constructor(
             return
         }
         if (!resolved.activated) {
+            val entrance = activationEntranceSupport.resolveEntrance()
             _uiState.value = HelperActivationUiState(
                 gateEnabled = true,
                 activated = false,
                 bannerTitle = "尚未开通",
                 bannerSubtitle = "购买访问码（月/季/年/永久）开通；到期需续费，无自动扣费",
-                showActivateAction = true,
+                showActivateAction = entrance.hasAnyVisible,
             )
             return
         }

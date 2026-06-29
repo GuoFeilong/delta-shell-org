@@ -1,5 +1,6 @@
 package com.delta.core.activation.model
 
+import com.delta.core.activation.model.dto.ActivationEntranceDto
 import com.delta.core.activation.model.dto.ReleaseGateDto
 import com.delta.core.activation.model.dto.TaskImageDto
 import com.delta.core.activation.model.dto.TaskListDto
@@ -10,6 +11,16 @@ fun ReleaseGateDto.toDomain(): ReleaseGate = ReleaseGate(
     uiMode = UiMode.from(uiMode),
     reason = reason,
     reviewMode = reviewMode,
+    entrance = entrance?.toDomain(),
+)
+
+fun ActivationEntranceDto.toDomain(): ActivationEntrance = ActivationEntrance(
+    cardConfigured = cardConfigured,
+    taskConfigured = taskConfigured,
+    cardVisible = cardVisible,
+    taskVisible = taskVisible,
+    defaultPath = ActivationEntrancePath.from(defaultPath),
+    configSource = configSource,
 )
 
 fun TaskListDto.toDomain(): TaskList = TaskList(

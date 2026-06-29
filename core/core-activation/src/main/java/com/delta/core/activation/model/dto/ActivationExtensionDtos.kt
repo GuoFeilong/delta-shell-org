@@ -3,10 +3,21 @@ package com.delta.core.activation.model.dto
 import kotlinx.serialization.Serializable
 
 @Serializable
+data class ActivationEntranceDto(
+    val cardConfigured: Boolean = true,
+    val taskConfigured: Boolean = true,
+    val cardVisible: Boolean = true,
+    val taskVisible: Boolean = true,
+    val defaultPath: String? = null,
+    val configSource: String = "DEFAULT",
+)
+
+@Serializable
 data class ReleaseGateDto(
     val uiMode: String,
     val reason: String,
     val reviewMode: Boolean,
+    val entrance: ActivationEntranceDto? = null,
 )
 
 @Serializable

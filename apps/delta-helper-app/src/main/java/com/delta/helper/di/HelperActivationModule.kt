@@ -2,6 +2,8 @@ package com.delta.helper.di
 
 import android.app.Application
 import com.delta.core.activation.api.ActivationApi
+import com.delta.core.activation.api.ext.ActivationTasksApi
+import com.delta.core.activation.api.ext.ReleaseGateApi
 import com.delta.core.activation.context.ActivationClientContext
 import com.delta.core.activation.context.ActivationHeaderFactory
 import com.delta.core.activation.context.AndroidDeviceProfileProvider
@@ -9,6 +11,8 @@ import com.delta.core.activation.context.DeviceProfileProvider
 import com.delta.core.activation.device.DeviceIdProvider
 import com.delta.core.activation.device.DeviceIdStore
 import com.delta.core.activation.repository.ActivationRepository
+import com.delta.core.activation.repository.ActivationTasksRepository
+import com.delta.core.activation.repository.ReleaseGateRepository
 import com.delta.core.network.config.NetworkConfig
 import com.delta.core.network.factory.NetworkClientFactory
 import com.delta.core.network.flow.ApiCallExecutor
@@ -45,7 +49,17 @@ object HelperActivationModule {
 
     @Provides
     @Singleton
+    fun provideReleaseGateApi(config: NetworkConfig): ReleaseGateApi =
+        NetworkClientFactory.createApiService(config)
+
+    @Provides
+    @Singleton
     fun provideActivationApi(config: NetworkConfig): ActivationApi =
+        NetworkClientFactory.createApiService(config)
+
+    @Provides
+    @Singleton
+    fun provideActivationTasksApi(config: NetworkConfig): ActivationTasksApi =
         NetworkClientFactory.createApiService(config)
 
     @Provides
@@ -60,5 +74,29 @@ object HelperActivationModule {
         activationApi = activationApi,
         headerFactory = headerFactory,
         clientContext = clientContext,
+    )
+
+    @Provides
+    @Singleton
+    fun provideReleaseGateRepository(
+        apiCallExecutor: ApiCallExecutor,
+        releaseGateApi: ReleaseGateApi,
+        headerFactory: ActivationHeaderFactory,
+    ): ReleaseGateRepository = ReleaseGateRepository(
+        apiCallExecutor = apiCallExecutor,
+        releaseGateApi = releaseGateApi,
+        headerFactory = headerFactory,
+    )
+
+    @Provides
+    @Singleton
+    fun provideActivationTasksRepository(
+        apiCallExecutor: ApiCallExecutor,
+        activationTasksApi: ActivationTasksApi,
+        headerFactory: ActivationHeaderFactory,
+    ): ActivationTasksRepository = ActivationTasksRepository(
+        apiCallExecutor = apiCallExecutor,
+        activationTasksApi = activationTasksApi,
+        headerFactory = headerFactory,
     )
 }

@@ -15,9 +15,35 @@ data class ReleaseGate(
     val uiMode: UiMode,
     val reason: String,
     val reviewMode: Boolean,
+    val entrance: ActivationEntrance? = null,
 ) {
     val requiresActivation: Boolean
         get() = uiMode == UiMode.FULL
+}
+
+data class ActivationEntrance(
+    val cardConfigured: Boolean,
+    val taskConfigured: Boolean,
+    val cardVisible: Boolean,
+    val taskVisible: Boolean,
+    val defaultPath: ActivationEntrancePath?,
+    val configSource: String,
+) {
+    val hasAnyVisible: Boolean
+        get() = cardVisible || taskVisible
+}
+
+enum class ActivationEntrancePath {
+    CARD,
+    TASK,
+    ;
+
+    companion object {
+        fun from(raw: String?): ActivationEntrancePath? =
+            raw?.let { value ->
+                entries.firstOrNull { it.name.equals(value, ignoreCase = true) }
+            }
+    }
 }
 
 enum class TaskUnlockMethod {
