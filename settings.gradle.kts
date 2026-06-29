@@ -49,3 +49,4 @@ include(":domain")
 
 // Build Logic (Convention Plugins)
 includeBuild("build-logic")
+include(":apps:delta-sights-helper")

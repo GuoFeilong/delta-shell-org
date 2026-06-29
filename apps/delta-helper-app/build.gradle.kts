@@ -72,8 +72,8 @@ android {
 
     defaultConfig {
         applicationId = "com.delta.helper"
-        versionCode = 103
-        versionName = "1.0.3"
+        versionCode = 104
+        versionName = "1.0.4"
 
         missingDimensionStrategy("environment", "online")
 
@@ -156,6 +156,26 @@ android {
             )
             buildConfigField("String", "CLIENT_CHANNEL", "\"official\"")
         }
+        create("xiaomi") {
+            dimension = "environment"
+            buildConfigField("String", "BUILD_ENV", "\"online\"")
+            buildConfigField(
+                "String",
+                "API_BASE_URL",
+                gradleString("xiaomiApiBaseUrl", "https://monster.hk.cn/").asBuildConfigString(),
+            )
+            buildConfigField(
+                "String",
+                "API_HOST_HEADER",
+                gradleString("xiaomiApiHostHeader", "").asBuildConfigString(),
+            )
+            buildConfigField("String", "CLIENT_CHANNEL", "\"xiaomi\"")
+            buildConfigField(
+                "String",
+                "PUBLISHER_KEY",
+                gradleString("xiaomiPublisherKey", "monster").asBuildConfigString(),
+            )
+        }
     }
 
     buildFeatures {
@@ -207,51 +227,53 @@ androidComponents {
         }
     }
 
-    onVariants(
-        androidComponents.selector()
-            .withFlavor("environment", "online")
-            .withBuildType("release"),
-    ) { variant ->
-        val variantName = variant.name
-        val artifactBaseName = "delta-helper-online-v$defaultVersionName-$defaultVersionCode"
-        val variantCapitalized = variantName.capitalizeVariantName()
-        val apkFileName = "$artifactBaseName.apk"
-        val aabFileName = "$artifactBaseName.aab"
+    listOf("online", "xiaomi").forEach { flavor ->
+        onVariants(
+            androidComponents.selector()
+                .withFlavor("environment", flavor)
+                .withBuildType("release"),
+        ) { variant ->
+            val variantName = variant.name
+            val artifactBaseName = "delta-helper-$flavor-v$defaultVersionName-$defaultVersionCode"
+            val variantCapitalized = variantName.capitalizeVariantName()
+            val apkFileName = "$artifactBaseName.apk"
+            val aabFileName = "$artifactBaseName.aab"
 
-        val renameApkTask = tasks.register<RenamePackagedArtifactTask>("rename${variantCapitalized}Apk") {
-            group = "build"
-            description = "Rename $variantName APK to include version"
-            dependsOn("package$variantCapitalized")
-            sourceDirectoryPaths.set(
-                layout.buildDirectory.dir("outputs/apk/online/release").map { dir ->
-                    listOf(dir.asFile.absolutePath)
-                },
-            )
-            artifactExtension.set("apk")
-            outputFileName.set(apkFileName)
-        }
+            val renameApkTask = tasks.register<RenamePackagedArtifactTask>("rename${variantCapitalized}Apk") {
+                group = "build"
+                description = "Rename $variantName APK to include version"
+                dependsOn("package$variantCapitalized")
+                sourceDirectoryPaths.set(
+                    layout.buildDirectory.dir("outputs/apk/$flavor/release").map { dir ->
+                        listOf(dir.asFile.absolutePath)
+                    },
+                )
+                artifactExtension.set("apk")
+                outputFileName.set(apkFileName)
+            }
 
-        val renameBundleTask = tasks.register<RenamePackagedArtifactTask>("rename${variantCapitalized}Bundle") {
-            group = "build"
-            description = "Rename $variantName AAB to include version"
-            dependsOn("bundle$variantCapitalized")
-            sourceDirectoryPaths.set(
-                provider {
-                    listOf(
-                        layout.buildDirectory.dir("outputs/bundle/$variantName").get().asFile.absolutePath,
-                        layout.buildDirectory.dir("outputs/bundle/online/release").get().asFile.absolutePath,
-                    )
-                },
-            )
-            artifactExtension.set("aab")
-            outputFileName.set(aabFileName)
-        }
+            val renameBundleTask = tasks.register<RenamePackagedArtifactTask>("rename${variantCapitalized}Bundle") {
+                group = "build"
+                description = "Rename $variantName AAB to include version"
+                dependsOn("bundle$variantCapitalized")
+                sourceDirectoryPaths.set(
+                    provider {
+                        listOf(
+                            layout.buildDirectory.dir("outputs/bundle/$variantName").get().asFile.absolutePath,
+                            layout.buildDirectory.dir("outputs/bundle/$flavor/release").get().asFile.absolutePath,
+                        )
+                    },
+                )
+                artifactExtension.set("aab")
+                outputFileName.set(aabFileName)
+            }
 
-        tasks.matching { it.name == "assemble$variantCapitalized" }.configureEach {
-            finalizedBy(renameApkTask)
-        }
-        tasks.matching { it.name == "bundle$variantCapitalized" }.configureEach {
-            finalizedBy(renameBundleTask)
+            tasks.matching { it.name == "assemble$variantCapitalized" }.configureEach {
+                finalizedBy(renameApkTask)
+            }
+            tasks.matching { it.name == "bundle$variantCapitalized" }.configureEach {
+                finalizedBy(renameBundleTask)
+            }
         }
     }
 }

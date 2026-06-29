@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="description" content="画质怪兽2026 — 游戏画质与帧率参考工具" />
+  <title>画质怪兽2026</title>
+  <style>
+    :root {
+      --primary: #00d4aa;
+      --primary-light: #33ddb8;
+      --primary-dark: #00a888;
+      --bg: #0f1117;
+      --bg-card: #1a1f2e;
+      --bg-elevated: #222838;
+      --bg-input: #12151c;
+      --text: #e8eaed;
+      --text-2: #8b9299;
+      --text-muted: #5c6370;
+      --border: #2a3142;
+      --warning: #ffb020;
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: system-ui, -apple-system, "PingFang SC", "Helvetica Neue", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.45;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .bg {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      background:
+        radial-gradient(ellipse 70% 50% at 15% 12%, rgba(0, 212, 170, 0.18), transparent 60%),
+        radial-gradient(ellipse 55% 45% at 85% 78%, rgba(0, 168, 136, 0.12), transparent 55%),
+        var(--bg);
+    }
+
+    .bg::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(42, 49, 66, 0.35) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(42, 49, 66, 0.35) 1px, transparent 1px);
+      background-size: 32px 32px;
+      mask-image: linear-gradient(to bottom, #000 0%, transparent 85%);
+    }
+
+    .page {
+      position: relative;
+      z-index: 1;
+      max-width: 520px;
+      margin: 0 auto;
+      padding: 28px 18px calc(120px + var(--safe-bottom));
+    }
+
+    /* Hero */
+    .hero { text-align: center; margin-bottom: 28px; }
+
+    .brand {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.28em;
+      background: linear-gradient(90deg, var(--primary), var(--primary-light));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .title {
+      margin-top: 10px;
+      font-size: clamp(28px, 7vw, 34px);
+      font-weight: 800;
+      letter-spacing: 0.02em;
+      background: linear-gradient(135deg, var(--text) 0%, var(--primary-light) 45%, var(--primary) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .subtitle {
+      margin-top: 8px;
+      font-size: 15px;
+      color: var(--text-2);
+    }
+
+    .badge {
+      display: inline-block;
+      margin-top: 18px;
+      padding: 8px 16px;
+      border-radius: 999px;
+      font-size: 12px;
+      color: var(--warning);
+      background: rgba(255, 176, 32, 0.04);
+      border: 1px solid rgba(255, 176, 32, 0.25);
+    }
+
+    /* Game cards */
+    .cards {
+      display: grid;
+      gap: 14px;
+    }
+
+    @media (min-width: 480px) {
+      .cards { grid-template-columns: 1fr 1fr; gap: 12px; }
+      .page { max-width: 640px; }
+    }
+
+    .card {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px;
+      border-radius: 18px;
+      background: linear-gradient(145deg, var(--bg-card), rgba(34, 40, 56, 0.92));
+      border: 1px solid var(--border);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      padding: 1px;
+      background: linear-gradient(135deg, var(--accent, var(--primary)) 55%, transparent 100%);
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      opacity: 0.55;
+      pointer-events: none;
+    }
+
+    .icon-wrap {
+      flex-shrink: 0;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: radial-gradient(circle, color-mix(in srgb, var(--accent) 35%, transparent), transparent 70%);
+      border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent);
+    }
+
+    .icon-wrap img {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .card-body { flex: 1; min-width: 0; }
+
+    .card-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .card-tag {
+      margin-top: 2px;
+      font-size: 11px;
+      color: var(--text-muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .card-meta {
+      margin-top: 6px;
+      font-size: 10px;
+      color: var(--text-2);
+    }
+
+    .fps-row {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      margin-top: 4px;
+    }
+
+    .fps {
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px 6px;
+      border-radius: 5px;
+      border: 1px solid var(--border);
+      background: var(--bg-input);
+      color: var(--text-2);
+    }
+
+    .fps.on {
+      color: var(--accent);
+      background: color-mix(in srgb, var(--accent) 18%, transparent);
+      border-color: color-mix(in srgb, var(--accent) 55%, transparent);
+    }
+
+    .chev {
+      flex-shrink: 0;
+      font-size: 22px;
+      line-height: 1;
+      color: color-mix(in srgb, var(--accent) 70%, transparent);
+      margin-right: 2px;
+    }
+
+    .footnote {
+      margin-top: 20px;
+      padding: 12px 14px;
+      border-radius: 12px;
+      font-size: 11px;
+      color: var(--text-muted);
+      text-align: center;
+      background: rgba(26, 31, 46, 0.75);
+      border: 1px solid var(--border);
+    }
+
+    /* Download bar */
+    .dl-bar {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 10;
+      padding: 12px 18px calc(12px + var(--safe-bottom));
+      background: linear-gradient(to top, rgba(15, 17, 23, 0.98) 70%, transparent);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+
+    .dl-inner {
+      max-width: 520px;
+      margin: 0 auto;
+    }
+
+    .dl-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      width: 100%;
+      padding: 15px 20px;
+      border: none;
+      border-radius: 14px;
+      font-size: 16px;
+      font-weight: 700;
+      color: #0a0f0d;
+      text-decoration: none;
+      background: linear-gradient(135deg, var(--primary-light), var(--primary) 55%, var(--primary-dark));
+      box-shadow: 0 8px 28px rgba(0, 212, 170, 0.28);
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .dl-btn:active {
+      transform: scale(0.98);
+      box-shadow: 0 4px 16px rgba(0, 212, 170, 0.2);
+    }
+
+    .dl-btn svg { flex-shrink: 0; }
+
+    .dl-hint {
+      margin-top: 8px;
+      font-size: 11px;
+      color: var(--text-muted);
+      text-align: center;
+      line-height: 1.5;
+    }
+
+    .legal {
+      margin-top: 14px;
+      font-size: 10px;
+      color: #444b57;
+      text-align: center;
+      line-height: 1.55;
+    }
+  </style>
+</head>
+<body>
+  <div class="bg" aria-hidden="true"></div>
+
+  <main class="page">
+    <header class="hero">
+      <p class="brand">GRAPHICS MONSTER</p>
+      <h1 class="title">画质怪兽</h1>
+      <p class="subtitle">游戏画质与帧率参考工具</p>
+      <p class="badge">144 / 165 帧参考方案库（非效果承诺）</p>
+    </header>
+
+    <section class="cards" aria-label="支持游戏">
+      <article class="card" style="--accent:#00d4aa">
+        <div class="icon-wrap">
+          <img src="icons/ic_game_delta-sm.webp" alt="" width="42" height="42" loading="lazy" />
+        </div>
+        <div class="card-body">
+          <h2 class="card-title">三角洲画质</h2>
+          <p class="card-tag">Delta Force · 战术竞技</p>
+          <p class="card-meta">高画质参考方案</p>
+          <div class="fps-row">
+            <span class="fps">144 FPS</span>
+            <span style="color:var(--text-muted);font-size:10px">/</span>
+            <span class="fps on">165 FPS</span>
+          </div>
+        </div>
+        <span class="chev" aria-hidden="true">›</span>
+      </article>
+
+      <article class="card" style="--accent:#ff8c42">
+        <div class="icon-wrap">
+          <img src="icons/ic_game_arena_breakout-sm.webp" alt="" width="42" height="42" loading="lazy" />
+        </div>
+        <div class="card-body">
+          <h2 class="card-title">暗区突围画质</h2>
+          <p class="card-tag">Arena Breakout · 硬核撤离</p>
+          <p class="card-meta">高画质参考方案</p>
+          <div class="fps-row">
+            <span class="fps">144 FPS</span>
+            <span style="color:var(--text-muted);font-size:10px">/</span>
+            <span class="fps on">165 FPS</span>
+          </div>
+        </div>
+        <span class="chev" aria-hidden="true">›</span>
+      </article>
+
+      <article class="card" style="--accent:#ffd166">
+        <div class="icon-wrap">
+          <img src="icons/ic_game_peace_elite-sm.webp" alt="" width="42" height="42" loading="lazy" />
+        </div>
+        <div class="card-body">
+          <h2 class="card-title">和平精英画质</h2>
+          <p class="card-tag">Peace Elite · 经典吃鸡</p>
+          <p class="card-meta">高画质参考方案</p>
+          <div class="fps-row">
+            <span class="fps">144 FPS</span>
+            <span style="color:var(--text-muted);font-size:10px">/</span>
+            <span class="fps on">165 FPS</span>
+          </div>
+        </div>
+        <span class="chev" aria-hidden="true">›</span>
+      </article>
+
+      <article class="card" style="--accent:#4da6ff">
+        <div class="icon-wrap">
+          <img src="icons/ic_game_call_of_duty-sm.webp" alt="" width="42" height="42" loading="lazy" />
+        </div>
+        <div class="card-body">
+          <h2 class="card-title">使命召唤画质</h2>
+          <p class="card-tag">Call of Duty · 快节奏 FPS</p>
+          <p class="card-meta">高画质参考方案</p>
+          <div class="fps-row">
+            <span class="fps">144 FPS</span>
+            <span style="color:var(--text-muted);font-size:10px">/</span>
+            <span class="fps on">165 FPS</span>
+          </div>
+        </div>
+        <span class="chev" aria-hidden="true">›</span>
+      </article>
+    </section>
+
+    <p class="footnote">请选择要查看参考方案的游戏（144 / 165 帧档位仅供参考）</p>
+    <p class="legal">第三方参考工具，与游戏官方无隶属关系。未知来源安装请在系统设置中允许。</p>
+  </main>
+
+  <div class="dl-bar">
+    <div class="dl-inner">
+      <a class="dl-btn" id="dl" href="https://www.monster.hk.cn/delta-helper-app-xiaomi-release.apk">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M17.5 12.5v5.25a2.25 2.25 0 0 1-2.25 2.25H8.75A2.25 2.25 0 0 1 6.5 17.75V12.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          <path d="M12 3.5v10.5M8.25 10.25 12 14l3.75-3.75" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        下载 Android v1.0.3
+      </a>
+      <p class="dl-hint" id="hint">安装后打开 App，选择游戏查看参考方案</p>
+    </div>
+  </div>
+
+  <script>
+    if (/MicroMessenger/i.test(navigator.userAgent)) {
+      document.getElementById('hint').textContent = '微信内：右上角 ··· → 在浏览器打开 → 再点下载';
+    }
+  </script>
+</body>
+</html>

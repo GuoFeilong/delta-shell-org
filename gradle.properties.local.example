@@ -14,8 +14,19 @@ onlineApiBaseUrl=https://api.hzgsapp.com/
 # 反代场景下覆盖 Host 头（直连可留空）
 # onlineApiHostHeader=api.hzgsapp.com
 
-# 发行渠道 key（请求头 X-Publisher-Key）
+# 发行渠道 key（请求头 X-Publisher-Key，online / daily 默认 official）
 # publisherKey=official
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# delta-helper-app · 小米渠道（xiaomiRelease / xiaomiDebug）
+# ═══════════════════════════════════════════════════════════════════════════════
+
+# 小米包默认 publisher=monster（可在 flavor 内覆盖）
+# xiaomiPublisherKey=monster
+
+# 小米 API（默认与 online 相同，可单独覆盖）
+# xiaomiApiBaseUrl=https://monster.hk.cn/
+# xiaomiApiHostHeader=
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # delta-helper-app · 本地开发（dailyDebug / dailyRelease）
