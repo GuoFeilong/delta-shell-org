@@ -8,6 +8,7 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -40,8 +41,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
@@ -504,6 +508,133 @@ private fun TaskProgressCard(uiState: TaskActivateUiState) {
     }
 }
 
+private enum class TaskFooterMode {
+    Answer,
+    StepCard,
+}
+
+@Composable
+private fun TaskFooterModeTabs(
+    selected: TaskFooterMode,
+    onSelected: (TaskFooterMode) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(12.dp))
+            .background(HzColors.BgInput)
+            .padding(4.dp),
+        horizontalArrangement = Arrangement.spacedBy(4.dp),
+    ) {
+        TaskFooterModeTab(
+            text = TaskActivateCopy.FOOTER_TAB_ANSWER,
+            selected = selected == TaskFooterMode.Answer,
+            onClick = { onSelected(TaskFooterMode.Answer) },
+            modifier = Modifier.weight(1f),
+        )
+        TaskFooterModeTab(
+            text = TaskActivateCopy.FOOTER_TAB_STEP_CARD,
+            selected = selected == TaskFooterMode.StepCard,
+            onClick = { onSelected(TaskFooterMode.StepCard) },
+            modifier = Modifier.weight(1f),
+        )
+    }
+}
+
+@Composable
+private fun TaskFooterModeTab(
+    text: String,
+    selected: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Box(
+        modifier = modifier
+            .height(40.dp)
+            .clip(RoundedCornerShape(8.dp))
+            .background(if (selected) HzColors.BgCard else HzColors.BgInput)
+            .clickable(onClick = onClick),
+        contentAlignment = Alignment.Center,
+    ) {
+        Text(
+            text = text,
+            style = MaterialTheme.typography.labelLarge,
+            color = if (selected) HzColors.TextPrimary else HzColors.TextMuted,
+            fontWeight = if (selected) FontWeight.Bold else FontWeight.Medium,
+        )
+    }
+}
+
+@Composable
+private fun TaskStepCardInlineInput(
+    value: String,
+    onValueChange: (String) -> Unit,
+    placeholder: String,
+    enabled: Boolean,
+    modifier: Modifier = Modifier,
+) {
+    BasicTextField(
+        value = value,
+        onValueChange = onValueChange,
+        enabled = enabled,
+        singleLine = true,
+        textStyle = MaterialTheme.typography.bodyLarge.copy(color = HzColors.TextPrimary),
+        cursorBrush = SolidColor(HzColors.Primary),
+        modifier = modifier
+            .height(48.dp)
+            .clip(RoundedCornerShape(12.dp))
+            .background(HzColors.BgInput)
+            .padding(horizontal = 16.dp),
+        decorationBox = { inner ->
+            Box(contentAlignment = Alignment.CenterStart) {
+                if (value.isEmpty()) {
+                    Text(
+                        text = placeholder,
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = HzColors.TextMuted,
+                    )
+                }
+                inner()
+            }
+        },
+    )
+}
+
+@Composable
+private fun TaskStepCardUnlockButton(
+    text: String,
+    onClick: () -> Unit,
+    enabled: Boolean,
+    modifier: Modifier = Modifier,
+) {
+    val alpha = if (enabled) 1f else 0.45f
+    Box(
+        modifier = modifier
+            .height(48.dp)
+            .clip(RoundedCornerShape(12.dp))
+            .background(
+                brush = Brush.linearGradient(
+                    colors = listOf(
+                        HzColors.Warning,
+                        HzColors.Warning.copy(alpha = 0.82f),
+                    ),
+                ),
+                alpha = alpha,
+            )
+            .clickable(enabled = enabled, onClick = onClick)
+            .padding(horizontal = 18.dp),
+        contentAlignment = Alignment.Center,
+    ) {
+        Text(
+            text = text,
+            style = MaterialTheme.typography.labelLarge,
+            color = HzColors.TextPrimary.copy(alpha = alpha),
+            fontWeight = FontWeight.Bold,
+        )
+    }
+}
+
 @Composable
 private fun TaskAnswerFooter(
     answer: String,
@@ -518,6 +649,8 @@ private fun TaskAnswerFooter(
     onRedeemStepCard: () -> Unit,
     onOpenLink: (String?) -> Unit,
 ) {
+    var footerMode by remember(step.id) { mutableStateOf(TaskFooterMode.Answer) }
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -527,44 +660,71 @@ private fun TaskAnswerFooter(
                 color = HzColors.Border,
                 shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp),
             )
-            .padding(horizontal = 18.dp, vertical = 14.dp),
+            .padding(horizontal = 18.dp, vertical = 12.dp),
         verticalArrangement = Arrangement.spacedBy(10.dp),
     ) {
-        HzCardInputField(
-            value = answer,
-            onValueChange = onAnswerChanged,
-            placeholder = TaskActivateCopy.ANSWER_PLACEHOLDER,
-            enabled = !isSubmitting,
-        )
-        HzPrimaryButton(
-            text = if (isSubmitting) TaskActivateCopy.SUBMITTING_BUTTON else TaskActivateCopy.SUBMIT_BUTTON,
-            onClick = onSubmit,
-            enabled = canSubmit,
-            modifier = Modifier.fillMaxWidth(),
-        )
-
         if (step.stepCardEnabled) {
+            TaskFooterModeTabs(
+                selected = footerMode,
+                onSelected = { footerMode = it },
+            )
+        }
+
+        if (!step.stepCardEnabled || footerMode == TaskFooterMode.Answer) {
             HzCardInputField(
-                value = stepCardCode,
-                onValueChange = onStepCardCodeChanged,
-                placeholder = TaskActivateCopy.STEP_CARD_PLACEHOLDER,
+                value = answer,
+                onValueChange = onAnswerChanged,
+                placeholder = TaskActivateCopy.ANSWER_PLACEHOLDER,
                 enabled = !isSubmitting,
             )
-            Row(
+            HzPrimaryButton(
+                text = if (isSubmitting) TaskActivateCopy.SUBMITTING_BUTTON else TaskActivateCopy.SUBMIT_BUTTON,
+                onClick = onSubmit,
+                enabled = canSubmit,
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            )
+        } else {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(14.dp))
+                    .background(HzColors.Warning.copy(alpha = 0.08f))
+                    .border(1.dp, HzColors.Warning.copy(alpha = 0.28f), RoundedCornerShape(14.dp))
+                    .padding(10.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                HzPrimaryButton(
-                    text = TaskActivateCopy.STEP_CARD_REDEEM,
-                    onClick = onRedeemStepCard,
-                    enabled = canRedeemStepCard,
-                    modifier = Modifier.weight(1f),
-                )
-                HzSecondaryButton(
-                    text = TaskActivateCopy.STEP_CARD_PURCHASE,
-                    onClick = { onOpenLink(step.stepCardPurchaseUrl) },
-                    enabled = !step.stepCardPurchaseUrl.isNullOrBlank(),
-                    modifier = Modifier.weight(1f),
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    TaskStepCardInlineInput(
+                        value = stepCardCode,
+                        onValueChange = onStepCardCodeChanged,
+                        placeholder = TaskActivateCopy.STEP_CARD_PLACEHOLDER,
+                        enabled = !isSubmitting,
+                        modifier = Modifier.weight(1f),
+                    )
+                    TaskStepCardUnlockButton(
+                        text = TaskActivateCopy.STEP_CARD_REDEEM,
+                        onClick = onRedeemStepCard,
+                        enabled = canRedeemStepCard,
+                    )
+                }
+                Text(
+                    text = TaskActivateCopy.STEP_CARD_PURCHASE_LINK,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable(enabled = !step.stepCardPurchaseUrl.isNullOrBlank()) {
+                            onOpenLink(step.stepCardPurchaseUrl)
+                        },
+                    style = MaterialTheme.typography.labelMedium,
+                    color = if (step.stepCardPurchaseUrl.isNullOrBlank()) {
+                        HzColors.TextMuted
+                    } else {
+                        HzColors.Primary
+                    },
+                    textAlign = TextAlign.Center,
                 )
             }
         }

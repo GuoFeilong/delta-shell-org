@@ -14,6 +14,8 @@
 |------|------|
 | delta-api | [`doc/multi-plan-card-release-20260626.md`](../../IdeaProjects/delta-api/doc/multi-plan-card-release-20260626.md)（全栈发版说明） |
 | delta-api | [`doc/publisher-card-link-design.md`](../../IdeaProjects/delta-api/doc/publisher-card-link-design.md)（购链与 plan 设计） |
+| delta-api | [`doc/activation-entrance-design.md`](../../IdeaProjects/delta-api/doc/activation-entrance-design.md)（激活入口三端设计） |
+| HZGS | [`docs/activation-entrance.md`](../../Hbuilder/HZGS/docs/activation-entrance.md)（H5/小程序实现，**暂未发版**） |
 | HZGS | `docs/发版文档.md`、`docs/小程序对接规划.md` |
 
 ## 应用模块
