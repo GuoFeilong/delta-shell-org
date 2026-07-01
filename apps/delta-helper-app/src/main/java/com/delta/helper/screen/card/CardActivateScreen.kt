@@ -38,6 +38,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.delta.helper.screen.component.ActivationRetentionDialog
 import com.delta.helper.screen.component.HzCardInputField
 import com.delta.helper.screen.component.HzConfirmDialog
 import com.delta.helper.screen.component.HzLegalAgreementRow
@@ -74,6 +75,7 @@ fun CardActivateRoute(
     val spec = rememberHelperAdaptiveSpec()
     var legalDoc by rememberSaveable { mutableStateOf<LegalDocType?>(null) }
     var handledActivationSuccessToken by remember(viewModelStoreKey) { mutableStateOf(0L) }
+    var showActivationRetentionDialog by remember(viewModelStoreKey) { mutableStateOf(false) }
 
     LaunchedEffect(
         uiState.activationSuccessToken,
@@ -85,15 +87,25 @@ fun CardActivateRoute(
                 uiState.successMessage != null
         if (hasNewSuccessfulActivation && !uiState.isActivating && !uiState.showActivateConfirm) {
             handledActivationSuccessToken = uiState.activationSuccessToken
-            onActivated()
+            showActivationRetentionDialog = true
+            viewModel.clearSuccessMessage()
         }
     }
 
-    BackHandler {
+    BackHandler(enabled = !showActivationRetentionDialog) {
         when {
             legalDoc != null -> legalDoc = null
             else -> onBack()
         }
+    }
+
+    if (showActivationRetentionDialog) {
+        ActivationRetentionDialog(
+            onDismiss = {
+                showActivationRetentionDialog = false
+                onActivated()
+            },
+        )
     }
 
     LaunchedEffect(viewModel) {

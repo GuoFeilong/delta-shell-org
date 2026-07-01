@@ -57,6 +57,7 @@ import coil.compose.AsyncImage
 import coil.compose.SubcomposeAsyncImage
 import com.delta.core.activation.model.TaskImage
 import com.delta.core.activation.model.TaskStep
+import com.delta.helper.screen.component.ActivationRetentionDialog
 import com.delta.helper.screen.component.HzCardInputField
 import com.delta.helper.screen.component.HzPrimaryButton
 import com.delta.helper.screen.component.HzSecondaryButton
@@ -83,6 +84,7 @@ fun TaskActivateRoute(
     val snackbarHostState = LocalHzSnackbarHostState.current
     val spec = rememberHelperAdaptiveSpec()
     var handledActivationSuccessToken by remember(viewModelStoreKey) { mutableStateOf(0L) }
+    var showActivationRetentionDialog by remember(viewModelStoreKey) { mutableStateOf(false) }
     var previewImageUrl by remember { mutableStateOf<String?>(null) }
 
     LaunchedEffect(viewModel) {
@@ -95,11 +97,12 @@ fun TaskActivateRoute(
     ) {
         if (uiState.activationSuccessToken > handledActivationSuccessToken && uiState.isActivated) {
             handledActivationSuccessToken = uiState.activationSuccessToken
-            onActivated()
+            showActivationRetentionDialog = true
+            viewModel.clearSuccessMessage()
         }
     }
 
-    BackHandler(onBack = onBack)
+    BackHandler(enabled = !showActivationRetentionDialog, onBack = onBack)
 
     LaunchedEffect(viewModel) {
         viewModel.openUrl.collect { url ->
@@ -122,6 +125,15 @@ fun TaskActivateRoute(
         type = HzSnackbarType.Success,
         onConsumed = viewModel::clearSuccessMessage,
     )
+
+    if (showActivationRetentionDialog) {
+        ActivationRetentionDialog(
+            onDismiss = {
+                showActivationRetentionDialog = false
+                onActivated()
+            },
+        )
+    }
 
     previewImageUrl?.let { url ->
         TaskImagePreviewDialog(
