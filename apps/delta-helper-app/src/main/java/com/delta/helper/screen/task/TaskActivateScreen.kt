@@ -102,7 +102,7 @@ fun TaskActivateRoute(
         }
     }
 
-    BackHandler(enabled = !showActivationRetentionDialog, onBack = onBack)
+    BackHandler(enabled = !showActivationRetentionDialog && !uiState.isCompletingActivation, onBack = onBack)
 
     LaunchedEffect(viewModel) {
         viewModel.openUrl.collect { url ->
@@ -157,7 +157,11 @@ fun TaskActivateRoute(
                     title = TaskActivateCopy.PAGE_TITLE,
                     subtitle = TaskActivateCopy.PAGE_SUBTITLE,
                     showBack = true,
-                    onBack = onBack,
+                    onBack = {
+                        if (!uiState.isCompletingActivation) {
+                            onBack()
+                        }
+                    },
                 )
 
                 when {

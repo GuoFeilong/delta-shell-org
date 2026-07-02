@@ -2,6 +2,7 @@ package com.delta.helper.screen
 
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -74,6 +75,16 @@ fun HelperRootScreen(
         }
     }
 
+    fun onActivationCompleted() {
+        showActivation = false
+        activationPath = null
+        activationLaunchNonce++
+        scope.launch {
+            activationViewModel.awaitRefresh()
+            showWechatGuideAfterActivation = true
+        }
+    }
+
     BackHandler {
         when {
             showEntranceDialog -> showEntranceDialog = false
@@ -107,68 +118,59 @@ fun HelperRootScreen(
         )
     }
 
-    when {
-        showActivation && activationPath == ActivationAccessPath.TASK -> {
-            TaskActivateRoute(
-                viewModelStoreKey = activationScreenKey,
-                modifier = modifier.fillMaxSize(),
-                onBack = {
-                    showActivation = false
-                    activationPath = null
-                },
-                onActivated = {
-                    showActivation = false
-                    activationPath = null
-                    activationLaunchNonce++
-                    activationViewModel.refresh()
-                    showWechatGuideAfterActivation = true
-                },
-            )
-        }
-
-        showActivation && activationPath == ActivationAccessPath.CARD -> {
-            CardActivateRoute(
-                viewModelStoreKey = activationScreenKey,
-                modifier = modifier.fillMaxSize(),
-                onBack = {
-                    showActivation = false
-                    activationPath = null
-                },
-                onActivated = {
-                    showActivation = false
-                    activationPath = null
-                    activationLaunchNonce++
-                    activationViewModel.refresh()
-                    showWechatGuideAfterActivation = true
-                },
-            )
-        }
-
-        selectedGameId != null -> {
-            val game = gameProfileFor(GameId.valueOf(selectedGameId!!))
-            GameDetailRoute(
-                game = game,
-                modifier = modifier.fillMaxSize(),
-                onBack = { selectedGameId = null },
-                onRequireActivation = { openActivation() },
-                activationLaunchNonce = activationLaunchNonce,
-                activationState = activationState,
-            )
-            if (showWechatGuideAfterActivation) {
-                WechatOfficialAccountGuideDialog(
-                    onDismiss = {
-                        showWechatGuideAfterActivation = false
+    Box(modifier = modifier.fillMaxSize()) {
+        when {
+            showActivation && activationPath == ActivationAccessPath.TASK -> {
+                TaskActivateRoute(
+                    viewModelStoreKey = activationScreenKey,
+                    modifier = Modifier.fillMaxSize(),
+                    onBack = {
+                        showActivation = false
+                        activationPath = null
                     },
+                    onActivated = ::onActivationCompleted,
+                )
+            }
+
+            showActivation && activationPath == ActivationAccessPath.CARD -> {
+                CardActivateRoute(
+                    viewModelStoreKey = activationScreenKey,
+                    modifier = Modifier.fillMaxSize(),
+                    onBack = {
+                        showActivation = false
+                        activationPath = null
+                    },
+                    onActivated = ::onActivationCompleted,
+                )
+            }
+
+            selectedGameId != null -> {
+                val game = gameProfileFor(GameId.valueOf(selectedGameId!!))
+                GameDetailRoute(
+                    game = game,
+                    modifier = Modifier.fillMaxSize(),
+                    onBack = { selectedGameId = null },
+                    onRequireActivation = { openActivation() },
+                    activationLaunchNonce = activationLaunchNonce,
+                    activationState = activationState,
+                )
+            }
+
+            else -> {
+                HelperHomeScreen(
+                    modifier = Modifier.fillMaxSize(),
+                    activationState = activationState,
+                    onGameSelected = { selectedGameId = it.name },
+                    onRequireActivation = { openActivation() },
                 )
             }
         }
 
-        else -> {
-            HelperHomeScreen(
-                modifier = modifier.fillMaxSize(),
-                activationState = activationState,
-                onGameSelected = { selectedGameId = it.name },
-                onRequireActivation = { openActivation() },
+        if (showWechatGuideAfterActivation) {
+            WechatOfficialAccountGuideDialog(
+                onDismiss = {
+                    showWechatGuideAfterActivation = false
+                },
             )
         }
     }

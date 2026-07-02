@@ -8,7 +8,9 @@ import com.delta.core.activation.model.TaskStep
 import com.delta.core.activation.model.TaskVerifyResult
 import com.delta.core.activation.repository.ActivationTasksRepository
 import com.delta.core.network.model.ApiResult
+import com.delta.helper.BuildConfig
 import com.delta.helper.activation.DeviceProfileSynchronizer
+import com.delta.helper.activation.LocalActivationSession
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -23,6 +25,7 @@ import kotlinx.coroutines.launch
 class TaskActivateViewModel @Inject constructor(
     private val activationTasksRepository: ActivationTasksRepository,
     private val deviceProfileSynchronizer: DeviceProfileSynchronizer,
+    private val localSession: LocalActivationSession,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(TaskActivateUiState())
     val uiState: StateFlow<TaskActivateUiState> = _uiState.asStateFlow()
@@ -188,40 +191,48 @@ class TaskActivateViewModel @Inject constructor(
 
     private fun completeActivation(token: String) {
         viewModelScope.launch {
-            activationTasksRepository.completeTasks(token).collect { result ->
-                when (result) {
-                    ApiResult.Loading -> Unit
-                    is ApiResult.Success -> {
-                        val activated = result.data.activated &&
-                            result.data.status == ActivationDeviceStatus.ACTIVE
-                        _uiState.update {
-                            it.copy(
-                                isSubmitting = false,
-                                isLoading = false,
-                                isActivated = activated,
-                                activationSuccessToken = if (activated) {
-                                    it.activationSuccessToken + 1
-                                } else {
-                                    it.activationSuccessToken
-                                },
-                                successMessage = if (activated) {
-                                    TaskActivateCopy.ACTIVATION_SUCCESS
-                                } else {
-                                    null
-                                },
-                                errorMessage = if (activated) null else "任务完成，但激活状态异常",
-                            )
+            _uiState.update { it.copy(isCompletingActivation = true) }
+            try {
+                activationTasksRepository.completeTasks(token).collect { result ->
+                    when (result) {
+                        ApiResult.Loading -> Unit
+                        is ApiResult.Success -> {
+                            val activated = result.data.activated &&
+                                result.data.status == ActivationDeviceStatus.ACTIVE
+                            if (activated && BuildConfig.SIMULATE_NOT_ACTIVATED) {
+                                localSession.markLocallyActivated()
+                            }
+                            _uiState.update {
+                                it.copy(
+                                    isSubmitting = false,
+                                    isLoading = false,
+                                    isActivated = activated,
+                                    activationSuccessToken = if (activated) {
+                                        it.activationSuccessToken + 1
+                                    } else {
+                                        it.activationSuccessToken
+                                    },
+                                    successMessage = if (activated) {
+                                        TaskActivateCopy.ACTIVATION_SUCCESS
+                                    } else {
+                                        null
+                                    },
+                                    errorMessage = if (activated) null else "任务完成，但激活状态异常",
+                                )
+                            }
                         }
-                    }
-                    is ApiResult.Error -> {
-                        _uiState.update {
-                            it.copy(
-                                isSubmitting = false,
-                                errorMessage = ActivationErrorCodes.messageFor(result.code, result.message),
-                            )
+                        is ApiResult.Error -> {
+                            _uiState.update {
+                                it.copy(
+                                    isSubmitting = false,
+                                    errorMessage = ActivationErrorCodes.messageFor(result.code, result.message),
+                                )
+                            }
                         }
                     }
                 }
+            } finally {
+                _uiState.update { it.copy(isCompletingActivation = false) }
             }
         }
     }
@@ -257,6 +268,7 @@ class TaskActivateViewModel @Inject constructor(
 data class TaskActivateUiState(
     val isLoading: Boolean = false,
     val isSubmitting: Boolean = false,
+    val isCompletingActivation: Boolean = false,
     val isActivated: Boolean = false,
     val steps: List<TaskStep> = emptyList(),
     val currentStep: TaskStep? = null,

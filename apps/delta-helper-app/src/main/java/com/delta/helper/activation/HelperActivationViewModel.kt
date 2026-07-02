@@ -29,5 +29,9 @@ class HelperActivationViewModel @Inject constructor(
         viewModelScope.launch { store.refresh(force = true) }
     }
 
+    suspend fun awaitRefresh() {
+        store.refresh(force = true)
+    }
+
     suspend fun resolveEntrance(): ActivationEntrance = entranceSupport.resolveEntrance()
 }

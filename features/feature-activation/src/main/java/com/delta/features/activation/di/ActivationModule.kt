@@ -98,9 +98,11 @@ object ActivationModule {
         apiCallExecutor: ApiCallExecutor,
         activationTasksApi: ActivationTasksApi,
         headerFactory: ActivationHeaderFactory,
+        clientContext: ActivationClientContext,
     ): ActivationTasksRepository = ActivationTasksRepository(
         apiCallExecutor = apiCallExecutor,
         activationTasksApi = activationTasksApi,
         headerFactory = headerFactory,
+        clientContext = clientContext,
     )
 }

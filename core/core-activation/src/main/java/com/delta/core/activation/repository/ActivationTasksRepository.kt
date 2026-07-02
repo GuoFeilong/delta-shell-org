@@ -18,6 +18,7 @@ class ActivationTasksRepository(
     private val apiCallExecutor: ApiCallExecutor,
     private val activationTasksApi: ActivationTasksApi,
     private val headerFactory: ActivationHeaderFactory,
+    private val clientContext: com.delta.core.activation.context.ActivationClientContext,
 ) {
     fun listTasks(): Flow<ApiResult<TaskList>> =
         apiCallExecutor.asEnvelopeFlow {
@@ -76,6 +77,7 @@ class ActivationTasksRepository(
                 clientChannel = headers.clientChannel,
                 clientVersion = headers.clientVersion,
                 publisherKey = headers.publisherKey,
+                appPackageName = clientContext.appPackageName,
                 deviceProfileHeaders = profile,
             )
         }.mapSuccess { it.toDomain() }

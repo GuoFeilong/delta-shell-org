@@ -58,6 +58,7 @@ interface ActivationTasksApi {
         @Header("X-Client-Channel") clientChannel: String,
         @Header("X-Client-Version") clientVersion: String? = null,
         @Header("X-Publisher-Key") publisherKey: String? = null,
+        @Header("X-App-Package-Name") appPackageName: String? = null,
         @HeaderMap deviceProfileHeaders: Map<String, String> = emptyMap(),
     ): ApiResponse<ActivationStatusDto>
 }
