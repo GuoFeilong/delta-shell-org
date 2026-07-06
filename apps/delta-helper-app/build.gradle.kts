@@ -72,8 +72,8 @@ android {
 
     defaultConfig {
         applicationId = "com.delta.helper"
-        versionCode = 105
-        versionName = "1.0.5"
+        versionCode = 106
+        versionName = "1.0.6"
 
         missingDimensionStrategy("environment", "online")
 

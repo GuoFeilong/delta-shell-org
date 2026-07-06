@@ -21,16 +21,16 @@ object ActivationErrorCodes {
     const val RATE_LIMIT_EXCEEDED = 1004
 
     fun messageFor(code: Int, fallback: String): String = when (code) {
-        CARD_INVALID_OR_USED -> "卡密无效或已被使用"
+        CARD_INVALID_OR_USED -> "访问码无效、已使用或输入有误，请核对后重试"
         CARD_CODE_REQUIRED -> "卡密不能为空"
         CLIENT_CONTEXT_INVALID -> "客户端信息无效"
         ACTIVATION_NOT_ACTIVE -> "设备尚未激活"
-        CARD_PUBLISHER_MISMATCH -> "卡密与当前入口不匹配"
-        CARD_PUBLISHER_LOCKED -> "设备已绑定其他 Publisher"
-        CARD_TYPE_MISMATCH -> "卡密类型不匹配"
+        CARD_PUBLISHER_MISMATCH -> "该访问码与当前安装包渠道不匹配，请使用对应渠道的安装包或联系客服"
+        CARD_PUBLISHER_LOCKED -> "当前设备已绑定其他渠道，请联系客服"
+        CARD_TYPE_MISMATCH -> "该访问码类型与当前入口不匹配"
         APK_PACKAGE_REQUIRED -> "缺少应用包名"
         APK_PACKAGE_NOT_ALLOWED -> "应用包名不可用"
-        CARD_PACKAGE_MISMATCH -> "卡密与应用包名不匹配"
+        CARD_PACKAGE_MISMATCH -> "该访问码与当前应用包名不匹配，请确认安装包"
         TASK_PROGRESS_INVALID -> "任务进度无效"
         STEP_CARD_NOT_ENABLED -> "当前步骤未开启卡密解锁"
         STEP_CARD_MISMATCH -> "该卡密不属于当前步骤"
